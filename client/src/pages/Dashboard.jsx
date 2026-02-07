@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import AsteroidCard from '../components/AsteroidCard';
 import StatCard from '../components/StatCard';
 import FeaturedAsteroidCard from '../components/FeaturedAsteroidCard';
@@ -13,6 +14,41 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRisk, setFilterRisk] = useState('all');
   const [sortBy, setSortBy] = useState('risk-desc');
+  const [refreshing, setRefreshing] = useState(false);
+  const { user } = useAuth();
+  
+  const isResearcher = user?.role === 'researcher';
+  
+  const handleRefreshData = async () => {
+    setRefreshing(true);
+    try {
+      await api.post('/asteroids/analytics/refresh');
+      alert('Data refresh initiated! NASA data will be updated in a few moments.');
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } catch (err) {
+      alert(err.response?.data?.msg || 'Refresh failed. Researcher access required.');
+    } finally {
+      setRefreshing(false);
+    }
+  };
+  
+  const handleExportData = () => {
+    const csvContent = 'data:text/csv;charset=utf-8,' + 
+      'Name,Risk Score,Approach Date,Diameter (m),Velocity (km/h),Distance (km)\n' +
+      asteroids.map(a => 
+        `"${a.name}",${a.riskScore},${a.approachDate},${a.diameter},${a.velocity},${a.distance}`
+      ).join('\n');
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `cosmic-watch-export-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   const [showSettings, setShowSettings] = useState(false); // <--- STATE
 
   const fetchData = async () => {
@@ -98,28 +134,58 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6 sm:space-y-8 p-4 sm:p-6 max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
-          <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-2">
-            <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 text-accent-purple" />
-            Live Monitor
-          </h2>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-2">
+              <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 text-accent-purple" />
+              Live Monitor
+            </h2>
+            {isResearcher && (
+              <Badge variant="secondary" className="flex items-center gap-1.5">
+                <FlaskConical className="h-3 w-3" />
+                Researcher
+              </Badge>
+            )}
+          </div>
           <p className="text-sm text-gray-500 mt-1">Real-time NEO tracking powered by NASA</p>
         </div>
         
         {/* --- CONTROLS SECTION --- */}
-        <div className="flex items-center gap-3">
-          {/* Settings Button */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs sm:text-sm text-gray-500 font-mono tabular-nums bg-white/[0.04] border border-white/10 px-2.5 sm:px-3 py-1.5 rounded-lg">
+            {new Date().toLocaleTimeString()}
+          </span>
+          
+          {isResearcher && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportData}
+                disabled={asteroids.length === 0}
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">Export</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRefreshData}
+                disabled={refreshing}
+              >
+                <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">{refreshing ? 'Refreshing...' : 'Refresh'}</span>
+              </Button>
+            </>
+          )}
+          
           <button 
             onClick={() => setShowSettings(!showSettings)}
             className={`p-2 rounded-lg transition-colors border ${showSettings ? 'bg-accent-purple text-white border-accent-purple' : 'bg-white/[0.04] border-white/10 text-gray-400 hover:text-white'}`}
           >
             <Settings className="w-5 h-5" />
           </button>
-          
-          <span className="text-xs sm:text-sm text-gray-500 font-mono tabular-nums bg-white/[0.04] border border-white/10 px-2.5 sm:px-3 py-1.5 rounded-lg truncate max-w-[180px] sm:max-w-none">
-            Last updated {new Date().toLocaleTimeString()}
-          </span>
         </div>
       </div>
 

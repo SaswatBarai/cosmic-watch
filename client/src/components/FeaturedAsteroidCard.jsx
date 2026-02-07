@@ -1,7 +1,10 @@
+import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, Calendar, Ruler, Rocket, Zap, TrendingUp } from 'lucide-react';
 import { Badge } from './ui/badge';
 
 export default function FeaturedAsteroidCard({ data }) {
+  const navigate = useNavigate();
+  
   if (!data) return null;
 
   const riskScore = data.riskScore ?? 0;
@@ -9,8 +12,15 @@ export default function FeaturedAsteroidCard({ data }) {
     (new Date(data.approachDate) - new Date()) / (1000 * 60 * 60 * 24)
   );
 
+  const handleCardClick = () => {
+    navigate(`/asteroids/${data.nasaId || data._id}`);
+  };
+
   return (
-    <div className="relative overflow-hidden rounded-2xl border-2 border-red-500/40 bg-gradient-to-br from-red-500/15 via-red-500/5 to-transparent glass-card shadow-[0_0_40px_-12px_rgba(239,68,68,0.4)]">
+    <div 
+      onClick={handleCardClick}
+      className="relative overflow-hidden rounded-2xl border-2 border-red-500/40 bg-gradient-to-br from-red-500/15 via-red-500/5 to-transparent glass-card shadow-[0_0_40px_-12px_rgba(239,68,68,0.4)] cursor-pointer transition-all duration-300 hover:border-red-500/60 hover:shadow-[0_0_50px_-10px_rgba(239,68,68,0.5)]"
+    >
       {/* Alert banner */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-red-400 to-red-500 animate-pulse" />
       
@@ -28,7 +38,7 @@ export default function FeaturedAsteroidCard({ data }) {
                 Highest Risk Object
               </span>
             </div>
-            <h3 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 leading-tight">
+            <h3 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 leading-tight hover:text-red-300 transition-colors">
               {data.name.replace(/[()]/g, '')}
             </h3>
             <p className="text-sm text-gray-400">

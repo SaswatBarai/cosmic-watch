@@ -1,8 +1,8 @@
+import mongoose from 'mongoose';
 import Asteroid from '../models/Asteroid.js';
 
 export const getAsteroids = async (req, res) => {
   try {
-    
     const asteroids = await Asteroid.find().sort({ riskScore: -1 });
     res.json(asteroids);
   } catch (error) {
@@ -12,7 +12,15 @@ export const getAsteroids = async (req, res) => {
 
 export const getAsteroidById = async (req, res) => {
   try {
-    const asteroid = await Asteroid.findOne({ nasaId: req.params.id });
+    const { id } = req.params;
+    let asteroid = null;
+
+    if (mongoose.Types.ObjectId.isValid(id) && String(new mongoose.Types.ObjectId(id)) === id) {
+      asteroid = await Asteroid.findById(id);
+    }
+    if (!asteroid) {
+      asteroid = await Asteroid.findOne({ nasaId: id });
+    }
     if (!asteroid) {
       return res.status(404).json({ message: 'Asteroid not found' });
     }

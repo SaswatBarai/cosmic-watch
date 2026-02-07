@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Rocket, Ruler, Zap, Calendar, Gauge, ChevronDown, Star, Clock, Share2, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
@@ -10,6 +11,7 @@ const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
   const [isWatchlisted, setIsWatchlisted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { user, refreshUser } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user?.watchlist) {
@@ -114,18 +116,23 @@ const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
     (new Date(data.approachDate) - new Date()) / (1000 * 60 * 60 * 24)
   );
 
+  const handleCardClick = () => {
+    navigate(`/asteroids/${data.nasaId || data._id}`);
+  };
+
   return (
     <Card
+      onClick={handleCardClick}
       className={`
         group relative overflow-hidden glass-card min-w-0
         bg-gradient-to-br ${glowBg}
         border border-white/10 transition-all duration-300
-        hover:-translate-y-1
+        hover:-translate-y-1 cursor-pointer
         ${cardAccent}
       `}
     >
       <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 p-4 sm:p-5 pb-2">
-        <CardTitle className="font-heading text-base sm:text-lg font-bold text-white min-w-0 leading-tight">
+        <CardTitle className="font-heading text-base sm:text-lg font-bold text-white min-w-0 leading-tight hover:text-accent-purple transition-colors">
           {data.name.replace(/[()]/g, '')}
         </CardTitle>
         <Badge variant={getRiskVariant(riskScore)} className="shrink-0 font-medium text-[10px] sm:text-xs">
@@ -213,7 +220,10 @@ const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
 
         <div className="flex items-center gap-2 pt-3 border-t border-white/10 mt-3">
           <button
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(!isExpanded);
+            }}
             className="flex items-center gap-2 text-xs text-gray-500 hover:text-accent-purple py-2 px-3 rounded-lg hover:bg-white/5 transition-all flex-1"
           >
             <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
@@ -222,7 +232,10 @@ const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
 
             <div className="flex items-center gap-1">
              <button
-              onClick={handleShare}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleShare(e);
+              }}
               className="flex items-center justify-center text-xs py-2 px-3 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 border border-white/10 transition-all"
               title="Share"
             >
@@ -230,7 +243,10 @@ const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
             </button>
             {showRemove ? (
               <button
-                onClick={handleRemove}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRemove(e);
+                }}
                 disabled={isLoading}
                 className={`
                   flex items-center gap-2 text-xs py-2 px-3 rounded-lg
@@ -243,7 +259,10 @@ const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
               </button>
             ) : user ? (
               <button
-                onClick={handleToggleWatchlist}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleWatchlist(e);
+                }}
                 disabled={isLoading}
                 className={`
                   flex items-center gap-2 text-xs py-2 px-3 rounded-lg
