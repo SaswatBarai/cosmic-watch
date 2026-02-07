@@ -20,6 +20,17 @@ export const AuthProvider = ({ children }) => {
     checkLoggedIn();
   }, []);
 
+  const refreshUser = async () => {
+    try {
+      const res = await api.get('/auth/me');
+      setUser(res.data);
+      return res.data;
+    } catch (err) {
+      setUser(null);
+      return null;
+    }
+  };
+
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email: email.toLowerCase(), password });
     setUser(res.data.user);
@@ -39,7 +50,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading, refreshUser }}>
       {!loading && children}
     </AuthContext.Provider>
   );

@@ -1,11 +1,22 @@
-import { useState } from 'react';
-import { Rocket, Ruler, Zap, Calendar, Gauge, ChevronDown, Star, Clock, Share2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Rocket, Ruler, Zap, Calendar, Gauge, ChevronDown, Star, Clock, Share2, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
+import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
-const AsteroidCard = ({ data }) => {
+const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isWatchlisted, setIsWatchlisted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { user, refreshUser } = useAuth();
+
+  useEffect(() => {
+    if (user?.watchlist) {
+      const isSaved = user.watchlist.some(w => w.asteroidId === (data.id || data._id || data.nasaId));
+      setIsWatchlisted(Boolean(isSaved));
+    }
+  }, [user, data]);
 
   const getRiskVariant = (score) => {
     if (score > 75) return 'destructive';
@@ -29,6 +40,58 @@ const AsteroidCard = ({ data }) => {
     e.stopPropagation();
     navigator.clipboard.writeText(`Check out asteroid ${data.name} on Cosmic Watch! Risk Score: ${data.riskScore}`);
     alert("Asteroid details copied to clipboard!");
+  };
+
+  const handleToggleWatchlist = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      alert('Please login to access the Deep Space Network database.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const asteroidId = data.id || data._id || data.nasaId;
+      if (isWatchlisted) {
+        await api.delete(`/watchlist/${asteroidId}`);
+        setIsWatchlisted(false);
+      } else {
+        await api.post('/watchlist', { asteroidId: asteroidId, name: data.name });
+        setIsWatchlisted(true);
+      }
+      // refresh global user/watchlist so other cards update
+      
+      try { await refreshUser(); } catch (e) { /* ignore */ }
+    } catch (error) {
+      console.error('Watchlist error:', error);
+      alert('Failed to update database. Connection unstable.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRemove = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+      alert('Please login to modify your watchlist.');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const asteroidId = data.id || data._id || data.nasaId;
+      await api.delete(`/watchlist/${asteroidId}`);
+      // refresh context
+      try { await refreshUser(); } catch (e) { /* ignore */ }
+      if (typeof onRemoved === 'function') onRemoved(asteroidId);
+    } catch (err) {
+      console.error('Remove error', err);
+      alert('Failed to remove from watchlist.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const riskScore = data.riskScore ?? 0;
@@ -157,7 +220,7 @@ const AsteroidCard = ({ data }) => {
             <span className="font-medium">{isExpanded ? 'Show less' : 'Show more'}</span>
           </button>
 
-          <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1">
              <button
               onClick={handleShare}
               className="flex items-center justify-center text-xs py-2 px-3 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 border border-white/10 transition-all"
@@ -165,20 +228,37 @@ const AsteroidCard = ({ data }) => {
             >
               <Share2 className="h-3.5 w-3.5" />
             </button>
-            <button
-              onClick={() => setIsWatchlisted(!isWatchlisted)}
-              className={`
-                flex items-center gap-2 text-xs py-2 px-3 rounded-lg
-                transition-all duration-200 font-medium
-                ${isWatchlisted 
-                  ? 'bg-accent-purple/20 text-accent-purple border border-accent-purple/30' 
-                  : 'text-gray-500 hover:text-accent-purple hover:bg-white/5 border border-white/10 hover:border-accent-purple/30'
-                }
-              `}
-            >
-              <Star className={`h-3.5 w-3.5 ${isWatchlisted ? 'fill-accent-purple' : ''}`} />
-              <span className="hidden sm:inline">{isWatchlisted ? 'Watching' : 'Watch'}</span>
-            </button>
+            {showRemove ? (
+              <button
+                onClick={handleRemove}
+                disabled={isLoading}
+                className={`
+                  flex items-center gap-2 text-xs py-2 px-3 rounded-lg
+                  transition-all duration-200 font-medium text-red-400 border border-transparent hover:bg-white/5 hover:border-white/10
+                  ${isLoading ? 'opacity-50 cursor-wait' : ''}
+                `}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">{isLoading ? 'Removing...' : 'Remove'}</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleToggleWatchlist}
+                disabled={isLoading}
+                className={`
+                  flex items-center gap-2 text-xs py-2 px-3 rounded-lg
+                  transition-all duration-200 font-medium
+                  ${isWatchlisted 
+                    ? 'bg-accent-purple/20 text-accent-purple border border-accent-purple/30' 
+                    : 'text-gray-500 hover:text-accent-purple hover:bg-white/5 border border-white/10 hover:border-accent-purple/30'
+                  }
+                  ${isLoading ? 'opacity-50 cursor-wait' : ''}
+                `}
+              >
+                <Star className={`h-3.5 w-3.5 ${isWatchlisted ? 'fill-accent-purple' : ''}`} />
+                <span className="hidden sm:inline">{isLoading ? 'Updating...' : (isWatchlisted ? 'Watching' : 'Watch')}</span>
+              </button>
+            )}
           </div>
         </div>
       </CardContent>

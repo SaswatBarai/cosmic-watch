@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Rocket, Bell, LayoutDashboard, Home, Telescope, Menu, X } from 'lucide-react';
+import { Rocket, Bell, LayoutDashboard, Home, Telescope, Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
@@ -9,7 +9,16 @@ const Navbar = () => {
 
   const isActive = (path) => location.pathname === path;
 
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      closeMobileMenu();
+    } catch (err) {
+      console.error('Logout failed', err);
+    }
+  };
 
   const navItems = [
     { name: 'Home', path: '/', icon: <Home size={18} /> },
@@ -57,10 +66,21 @@ const Navbar = () => {
               <span className="absolute top-1 right-1 sm:top-1.5 sm:right-1.5 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-red-500 ring-2 ring-space-950" />
             </button>
             {user ? (
-              <button className="hidden sm:flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-200">
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-inner" />
-                <span className="text-sm font-medium text-gray-300">{user.username || 'Profile'}</span>
-              </button>
+              <div className="hidden sm:flex items-center gap-2">
+                <button className="hidden sm:flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-200">
+                  <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-inner">
+                    {user.username?.[0]?.toUpperCase()}
+                  </div>
+                  <span className="text-sm font-medium text-gray-300">{user.username || 'Profile'}</span>
+                </button>
+                <button 
+                  onClick={handleLogout}
+                  className="p-2 rounded-xl text-gray-400 hover:text-red-400 hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
+                  title="Terminate Session"
+                >
+                  <LogOut size={18} />
+                </button>
+              </div>
             ) : (
               <Link to="/login" className="hidden sm:inline-flex items-center gap-2 pl-3 pr-4 py-2 rounded-xl border border-white/10 bg-accent-purple/90 text-white hover:bg-accent-purple/80 transition-all duration-200">
                 <span className="text-sm font-medium">Login</span>
