@@ -49,16 +49,23 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ msg: 'Invalid Credentials' });
-
+    if (!email || !password) {
+      return res.status(400).json({ msg: 'Email and password are required' });
+    }
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user) {
+      console.log('[auth/login] No user for email:', email?.substring(0, 3) + '***');
+      return res.status(400).json({ msg: 'Invalid Credentials' });
+    }
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ msg: 'Invalid Credentials' });
-
+    if (!isMatch) {
+      console.log('[auth/login] Wrong password for email:', email?.substring(0, 3) + '***');
+      return res.status(400).json({ msg: 'Invalid Credentials' });
+    }
     sendTokenResponse(user, 200, res);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    console.error('[auth/login]', err.message);
+    res.status(500).json({ msg: 'Server error' });
   }
 });
 
@@ -69,16 +76,20 @@ router.post('/logout', (req, res) => {
 
 router.get('/me', auth, async (req, res) => {
   try {
-    const user = req.user
-    const userId = req.user.id;
-    const dbUser = await User.findById(userId).select('-password');
-    if(!dbUser){
-        return res.status(404).json({ msg: 'User not found' });
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ msg: 'Invalid token' });
+    }
+    const dbUser = await User.findById(userId).select('-password').lean();
+    if (!dbUser) {
+      // Stale token (e.g. user deleted or DB reset) – clear cookie so client stops sending it
+      res.clearCookie('token');
+      return res.status(404).json({ msg: 'User not found' });
     }
     res.json(dbUser);
-    
   } catch (err) {
-    res.status(500).send('Server Error');
+    console.error('[auth/me]', err);
+    res.status(500).json({ msg: 'Server Error' });
   }
 });
 

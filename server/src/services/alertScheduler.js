@@ -4,7 +4,20 @@ import Asteroid from '../models/Asteroid.js';
 import User from '../models/User.js'; // Import User model
 import { sendRiskAlert } from './emailService.js'; // Import Email Service
 
-export const initScheduler = () => {
+export const initScheduler = async () => {
+  // Fetch data immediately on startup so a fresh DB isn't empty
+  try {
+    const count = await Asteroid.countDocuments();
+    if (count === 0) {
+      console.log('📡 Empty database detected – fetching initial data from NASA...');
+      await fetchAsteroidData();
+    } else {
+      console.log(`✅ Database already has ${count} asteroids. Skipping initial fetch.`);
+    }
+  } catch (err) {
+    console.error('⚠️ Initial NASA fetch failed:', err.message);
+  }
+
   // Task 1: Data Refresh (Every 4 hours)
   cron.schedule('0 */4 * * *', async () => {
     console.log('🔄 Cron: Refreshing Asteroid Data from NASA...');

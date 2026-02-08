@@ -10,23 +10,24 @@ const Watchlist = () => {
   useEffect(() => {
     const fetchWatchlist = async () => {
       try {
-        const { data: userWatchlist } = await api.get('/watchlist');
-
-        if (!userWatchlist || userWatchlist.length === 0) {
+        const { data } = await api.get('/watchlist');
+        const userWatchlist = Array.isArray(data) ? data : [];
+        if (userWatchlist.length === 0) {
           setFavorites([]);
           return;
         }
 
         // If backend returns full asteroid objects, use them directly
-        const containsObjects = userWatchlist.every(w => w.asteroid && (w.asteroid._id || w.asteroid.nasaId));
+        const containsObjects = userWatchlist.every(w => w && w.asteroid && (w.asteroid._id || w.asteroid.nasaId));
         if (containsObjects) {
-          setFavorites(userWatchlist.map(w => w.asteroid));
+          setFavorites(userWatchlist.map(w => w.asteroid).filter(Boolean));
           return;
         }
 
         // Fallback: fetch all asteroids and filter by saved IDs
-        const { data: allAsteroids } = await api.get('/asteroids');
-        const savedIds = userWatchlist.map(w => w.asteroidId || w.asteroid || w.id).filter(Boolean);
+        const { data: asteroidsData } = await api.get('/asteroids');
+        const allAsteroids = Array.isArray(asteroidsData) ? asteroidsData : [];
+        const savedIds = userWatchlist.map(w => w.asteroidId || (w.asteroid && (w.asteroid._id || w.asteroid.nasaId)) || w.id).filter(Boolean);
         const filtered = allAsteroids.filter(ast => savedIds.includes(ast._id) || savedIds.includes(ast.nasaId) || savedIds.includes(ast.id));
         setFavorites(filtered);
       } catch (err) {

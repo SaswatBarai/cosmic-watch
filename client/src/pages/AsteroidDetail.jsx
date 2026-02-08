@@ -51,12 +51,15 @@ const AsteroidDetail = () => {
   }, [id]);
 
   useEffect(() => {
-    if (user?.watchlist && asteroid) {
+    const list = user?.watchlist;
+    if (Array.isArray(list) && asteroid) {
       const aid = asteroid._id || asteroid.nasaId;
-      const saved = user.watchlist.some((w) => w.asteroidId === aid);
+      const saved = list.some((w) => w && w.asteroidId === aid);
       setIsWatchlisted(Boolean(saved));
+    } else {
+      setIsWatchlisted(false);
     }
-  }, [user, asteroid]);
+  }, [user, user?.watchlist, asteroid]);
 
   const getRiskVariant = (score) => {
     if (score > 75) return 'destructive';

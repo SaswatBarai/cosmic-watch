@@ -13,8 +13,15 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
+    const trimmedEmail = (email || '').trim().toLowerCase();
+    const trimmedPassword = (password || '').trim();
+    if (!trimmedEmail || !trimmedPassword) {
+      setError('Email and password are required');
+      return;
+    }
     try {
-      await login(email, password);
+      await login(trimmedEmail, trimmedPassword);
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.msg || 'Invalid credentials');
@@ -36,10 +43,10 @@ const Login = () => {
           <form onSubmit={handleLogin} className="space-y-4">
             {error && <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm text-center">{error}</div>}
             
-            <input type="email" placeholder="name@agency.gov" required className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-accent-purple outline-none"
-              onChange={(e) => setEmail(e.target.value)} />
-            <input type="password" placeholder="••••••••" required className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-accent-purple outline-none"
-              onChange={(e) => setPassword(e.target.value)} />
+            <input type="email" placeholder="Email (use the one you registered with)" required className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-accent-purple outline-none"
+              value={email} onChange={(e) => { setEmail(e.target.value); setError(''); }} />
+            <input type="password" placeholder="Password" required className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-accent-purple outline-none"
+              value={password} onChange={(e) => { setPassword(e.target.value); setError(''); }} />
 
             <button type="submit" className="w-full bg-accent-purple hover:bg-accent-purple/90 text-white font-bold py-3.5 rounded-lg flex items-center justify-center gap-2 mt-4">
               Initiate Session <ArrowRight className="w-4 h-4" />
@@ -48,6 +55,9 @@ const Login = () => {
           <div className="mt-6 text-center text-sm text-gray-500">
             Need access? <Link to="/register" className="text-accent-purple hover:text-accent-purple/80">Register new terminal</Link>
           </div>
+          <p className="mt-4 text-xs text-gray-500 text-center">
+            Use the <strong>email</strong> you registered with (not username).
+          </p>
         </CardContent>
       </Card>
     </div>

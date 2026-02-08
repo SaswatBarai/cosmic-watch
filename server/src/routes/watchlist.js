@@ -7,46 +7,47 @@ const router = express.Router();
 router.post('/', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-    if(!user){
-        return res.status(404).json({ msg: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
     }
+    const watchlist = Array.isArray(user.watchlist) ? user.watchlist : [];
     const { asteroidId, name } = req.body;
-
-    if (user.watchlist.some(item => item.asteroidId === asteroidId)) {
+    if (watchlist.some(item => item.asteroidId === asteroidId)) {
       return res.status(400).json({ msg: 'Asteroid already in watchlist' });
     }
-
-    user.watchlist.unshift({ asteroidId, name });
+    user.watchlist = [{ asteroidId, name }, ...watchlist];
     await user.save();
-    res.json(user.watchlist);
+    res.json(Array.isArray(user.watchlist) ? user.watchlist : []);
   } catch (err) {
-    res.status(500).send('Server Error');
+    res.status(500).json({ msg: 'Server Error' });
   }
 });
 
 router.get('/', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-    if(!user){
-        return res.status(404).json({ msg: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
     }
-    res.json(user.watchlist);
+    const watchlist = Array.isArray(user.watchlist) ? user.watchlist : [];
+    res.json(watchlist);
   } catch (err) {
-    res.status(500).send('Server Error');
+    res.status(500).json({ msg: 'Server Error' });
   }
 });
 
 router.delete('/:id', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-    if(!user){
-        return res.status(404).json({ msg: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
     }
-    user.watchlist = user.watchlist.filter(item => item.asteroidId !== req.params.id);
+    const watchlist = Array.isArray(user.watchlist) ? user.watchlist : [];
+    user.watchlist = watchlist.filter(item => item.asteroidId !== req.params.id);
     await user.save();
-    res.json(user.watchlist);
+    res.json(Array.isArray(user.watchlist) ? user.watchlist : []);
   } catch (err) {
-    res.status(500).send('Server Error');
+    res.status(500).json({ msg: 'Server Error' });
   }
 });
 

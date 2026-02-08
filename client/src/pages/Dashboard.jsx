@@ -54,9 +54,11 @@ const Dashboard = () => {
   const fetchData = async () => {
     try {
       const res = await api.get('/asteroids');
-      setAsteroids(res.data);
+      const data = res.data;
+      setAsteroids(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setAsteroids([]);
     } finally {
       setLoading(false);
     }
@@ -71,7 +73,8 @@ const Dashboard = () => {
   }, []);
 
   const filteredAndSortedAsteroids = useMemo(() => {
-    let filtered = [...asteroids];
+    const list = Array.isArray(asteroids) ? asteroids : [];
+    let filtered = [...list];
     if (searchQuery) {
       filtered = filtered.filter(a =>
         a.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -107,15 +110,16 @@ const Dashboard = () => {
   }, [asteroids, searchQuery, filterRisk, sortBy]);
 
   const stats = useMemo(() => {
-    const total = asteroids.length;
-    const hazardous = asteroids.filter(a => a.isHazardous || a.riskScore > 75).length;
+    const list = Array.isArray(asteroids) ? asteroids : [];
+    const total = list.length;
+    const hazardous = list.filter(a => a && (a.isHazardous || a.riskScore > 75)).length;
     const safe = total - hazardous;
     
-    const closest = asteroids.reduce((prev, curr) => 
-      (!prev.distance || curr.distance < prev.distance) ? curr : prev, asteroids[0] || {}
+    const closest = list.reduce((prev, curr) => 
+      curr && (!prev.distance || (curr.distance != null && curr.distance < prev.distance)) ? curr : prev, list[0] || {}
     );
-    const highestRisk = asteroids.reduce((prev, curr) =>
-      ((curr.riskScore ?? 0) > (prev.riskScore ?? 0)) ? curr : prev, asteroids[0] || null
+    const highestRisk = list.reduce((prev, curr) =>
+      curr && ((curr.riskScore ?? 0) > (prev?.riskScore ?? 0)) ? curr : prev, list[0] || null
     );
 
     return { total, hazardous, safe, closest, highestRisk };
@@ -218,8 +222,8 @@ const Dashboard = () => {
       
         <StatCard
           title="Closest Approach"
-          value={`${(stats.closest?.distance / 1000000).toFixed(1)}M`}
-          subtitle={stats.closest?.name?.replace(/[()]/g, '') || 'N/A'}
+          value={stats.closest?.distance != null ? `${(stats.closest.distance / 1000000).toFixed(1)}M` : '—'}
+          subtitle={stats.closest?.name?.replace(/[()]/g, '') || 'No data yet'}
           icon={Activity}
           variant="amber"
         />

@@ -6,10 +6,19 @@ const router = express.Router();
 
 router.get('/preferences', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('alertPreferences');
-    res.json(user.alertPreferences);
+    const user = await User.findById(req.user.id).select('alertPreferences').lean();
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    const prefs = user.alertPreferences || {
+      minRiskScore: 50,
+      notifyImminent: true,
+      emailFrequency: 'daily',
+    };
+    res.json(prefs);
   } catch (err) {
-    res.status(500).send('Server Error');
+    console.error('[alerts/preferences GET]', err);
+    res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -17,13 +26,19 @@ router.post('/preferences', auth, async (req, res) => {
   try {
     const { minRiskScore, notifyImminent, emailFrequency } = req.body;
     const user = await User.findById(req.user.id);
-
-    user.alertPreferences = { minRiskScore, notifyImminent, emailFrequency };
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    user.alertPreferences = {
+      minRiskScore: minRiskScore ?? 50,
+      notifyImminent: notifyImminent ?? true,
+      emailFrequency: emailFrequency ?? 'daily',
+    };
     await user.save();
-
     res.json(user.alertPreferences);
   } catch (err) {
-    res.status(500).send('Server Error');
+    console.error('[alerts/preferences POST]', err);
+    res.status(500).json({ msg: 'Server Error' });
   }
 });
 

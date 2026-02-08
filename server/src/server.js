@@ -26,7 +26,16 @@ const io = new Server(httpServer, {
     transports: ['websocket', 'polling']
 });
 
-const allowedOrigins = [process.env.CLIENT_URL || 'http://localhost:5173', 'http://localhost:5174'];
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost',
+  'http://localhost:80',
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1',
+  'http://127.0.0.1:80',
+].filter(Boolean);
+if (allowedOrigins.length === 0) allowedOrigins.push('http://localhost:5173');
 
 app.use(cors({
     origin: (origin, callback) => {
@@ -40,6 +49,16 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+
+// Request logging (so Docker logs show every API call)
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`);
+  });
+  next();
+});
 
 // Track active users per asteroid room
 const roomUsers = new Map(); // Map<asteroidId, Set<{socketId, userId, userName}>>
@@ -218,12 +237,20 @@ app.use('/api/alerts', alertRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-// Start httpServer instead of app.listen to support sockets
-httpServer.listen(PORT, () => {
-    connectDB();
-    console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-    
-    initScheduler();
-});
+// Start httpServer – connect to DB first, then start listening
+const startServer = async () => {
+    try {
+        await connectDB();
+        httpServer.listen(PORT, async () => {
+            console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+            await initScheduler();
+        });
+    } catch (err) {
+        console.error('Failed to start server:', err.message);
+        process.exit(1);
+    }
+};
+
+startServer();
 
 export default app;

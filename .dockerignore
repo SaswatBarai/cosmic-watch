@@ -1,0 +1,13 @@
+node_modules
+.git
+.gitignore
+.env
+*.log
+.DS_Store
+.vscode
+coverage
+dist
+build
+README.md
+AI-LOG.md
+PHASE4-AUDIT.md

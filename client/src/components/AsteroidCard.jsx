@@ -14,11 +14,14 @@ const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user?.watchlist) {
-      const isSaved = user.watchlist.some(w => w.asteroidId === (data.id || data._id || data.nasaId));
+    const list = user?.watchlist;
+    if (Array.isArray(list)) {
+      const isSaved = list.some(w => w && w.asteroidId === (data?.id || data?._id || data?.nasaId));
       setIsWatchlisted(Boolean(isSaved));
+    } else {
+      setIsWatchlisted(false);
     }
-  }, [user, data]);
+  }, [user, user?.watchlist, data]);
 
   const getRiskVariant = (score) => {
     if (score > 75) return 'destructive';
