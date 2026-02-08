@@ -33,6 +33,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email: email.toLowerCase(), password });
+    if (res.data.token) localStorage.setItem('token', res.data.token);
     setUser(res.data.user);
     return res.data;
   };
@@ -40,12 +41,14 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     const payload = { ...userData, email: (userData.email || '').toLowerCase() };
     const res = await api.post('/auth/register', payload);
+    if (res.data.token) localStorage.setItem('token', res.data.token);
     setUser(res.data.user);
     return res.data;
   };
 
   const logout = async () => {
     await api.post('/auth/logout');
+    localStorage.removeItem('token');
     setUser(null);
   };
 

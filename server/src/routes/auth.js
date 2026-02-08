@@ -16,17 +16,23 @@ const sendTokenResponse = (user, statusCode, res) => {
     { expiresIn: '24h' }
   );
 
+  const isProduction = process.env.NODE_ENV === 'production';
+
   const options = {
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000), 
     httpOnly: true, 
-    secure: process.env.NODE_ENV === 'production', 
-    sameSite: 'strict' 
+    secure: isProduction, 
+    sameSite: isProduction ? 'none' : 'strict'  // 'none' needed for cross-origin (Render)
   };
 
   res
     .status(statusCode)
     .cookie('token', token, options) 
-    .json({ success: true, user: { id: user.id, username: user.username, role: user.role, watchlist: user.watchlist } });
+    .json({ 
+      success: true, 
+      token,  // Also send token in body so frontend can store in localStorage (cross-origin fallback)
+      user: { id: user.id, username: user.username, role: user.role, watchlist: user.watchlist } 
+    });
 };
 
 router.post('/register', async (req, res) => {

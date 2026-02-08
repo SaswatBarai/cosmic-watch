@@ -24,11 +24,12 @@ dotenv.config(); // Also try cwd for Docker/Railway where .env may be in /app
 const app = express();
 const httpServer = createServer(app); 
 
-// Build allowed origins from env vars (supports Railway, Docker, and local dev)
+// Build allowed origins from env vars (supports Render, Railway, Docker, and local dev)
 const allowedOrigins = [
   process.env.CLIENT_URL,
-  process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : null,
   process.env.FRONTEND_URL,
+  process.env.RENDER_EXTERNAL_URL,  // Render auto-injects this
+  process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : null,
   'http://localhost',
   'http://localhost:80',
   'http://localhost:5173',
@@ -37,6 +38,7 @@ const allowedOrigins = [
   'http://127.0.0.1:80',
 ].filter(Boolean);
 if (allowedOrigins.length === 0) allowedOrigins.push('http://localhost:5173');
+console.log('Allowed CORS origins:', allowedOrigins);
 
 const io = new Server(httpServer, {
     cors: {
@@ -227,7 +229,7 @@ io.on('connection', (socket) => {
 });
 
 
-// Health check / root endpoint (frontend takes over in production)
+// Health check endpoint (used by Render / Railway / Docker)
 app.get('/health', (req, res) => {
     res.status(200).json({ 
         message: 'Perilux Backend Running', 
@@ -235,15 +237,14 @@ app.get('/health', (req, res) => {
     });
 });
 
-// In dev mode (no static frontend), also serve JSON at root
-if (process.env.NODE_ENV !== 'production') {
-    app.get('/', (req, res) => {
-        res.status(200).json({ 
-            message: 'Perilux Backend Running', 
-            status: 'OK' 
-        });
+// Root endpoint
+app.get('/', (req, res) => {
+    res.status(200).json({ 
+        message: 'Perilux Backend Running', 
+        status: 'OK',
+        docs: '/api'
     });
-}
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/asteroids', asteroidRoutes);

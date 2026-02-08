@@ -10,10 +10,10 @@ let socket = null;
 
 function getSocket() {
   if (!socket) {
-    // In production (same origin), use undefined so socket.io auto-connects to current host
-    const socketUrl = import.meta.env.PROD 
-      ? undefined 
-      : (import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000');
+    // VITE_SOCKET_URL = backend root URL (e.g. https://perilux-api.onrender.com)
+    // In production cross-origin deployments this MUST be set
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || 
+                      (import.meta.env.PROD ? undefined : 'http://localhost:5000');
     socket = io(socketUrl, {
       withCredentials: true,
       reconnection: true,
