@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { MessageCircle, Send, Loader2, Users } from 'lucide-react';
 import { io } from 'socket.io-client'; 
 import { useAuth } from '../context/AuthContext'; 
-import api from '../services/api'; 
 import { Button } from './ui/button';
 import { Input } from './ui/input'; 
 

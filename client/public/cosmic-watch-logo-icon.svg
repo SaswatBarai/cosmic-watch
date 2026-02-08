@@ -1,0 +1,169 @@
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients -->
+    <radialGradient id="earthGradient" cx="35%" cy="35%">
+      <stop offset="0%" style="stop-color:#7EC8E3;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#4A9EFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2563EB;stop-opacity:1" />
+    </radialGradient>
+    
+    <radialGradient id="orbitGlow">
+      <stop offset="0%" style="stop-color:#00D4FF;stop-opacity:0.5" />
+      <stop offset="100%" style="stop-color:#00D4FF;stop-opacity:0" />
+    </radialGradient>
+    
+    <linearGradient id="asteroidRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B6B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EE5A6F;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="asteroidOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFB84D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFA726;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="asteroidPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9D7BFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C4DFF;stop-opacity:1" />
+    </linearGradient>
+    
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="dropShadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.4"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Black Background -->
+  <rect width="400" height="400" fill="#000000"/>
+  
+  <!-- Center at 200, 200 -->
+  <g transform="translate(200, 200)">
+    
+    <!-- Outer Glow Effect -->
+    <circle cx="0" cy="0" r="150" fill="url(#orbitGlow)" opacity="0.3"/>
+    
+    <!-- Outer Orbit Ring -->
+    <circle cx="0" cy="0" r="120" fill="none" stroke="#00D4FF" stroke-width="2.5" opacity="0.6"/>
+    <circle cx="0" cy="0" r="120" fill="none" stroke="#00D4FF" stroke-width="1.5" opacity="0.3" stroke-dasharray="12 6"/>
+    
+    <!-- Middle Orbit Ring -->
+    <circle cx="0" cy="0" r="95" fill="none" stroke="#0EA5E9" stroke-width="1.8" opacity="0.5" stroke-dasharray="8 4"/>
+    
+    <!-- Inner Orbit (Ellipse) -->
+    <ellipse cx="0" cy="0" rx="120" ry="80" fill="none" stroke="#0EA5E9" stroke-width="1.5" opacity="0.35" transform="rotate(-30)"/>
+    
+    <!-- Earth Core Shadow -->
+    <circle cx="0" cy="0" r="62" fill="#1565C0" opacity="0.2"/>
+    
+    <!-- Earth -->
+    <circle cx="0" cy="0" r="60" fill="url(#earthGradient)" filter="url(#dropShadow)"/>
+    
+    <!-- Earth Continents -->
+    <path d="M -28 -15 Q -20 -22 -10 -18 Q 0 -15 5 -8 Q 8 0 4 8 Q -3 14 -13 11 Q -22 6 -28 -3 Z" 
+          fill="#1E40AF" opacity="0.6"/>
+    <path d="M 15 -5 Q 22 -9 30 -5 Q 34 0 32 7 Q 26 13 18 11 Q 12 8 15 0 Z" 
+          fill="#1E40AF" opacity="0.6"/>
+    <path d="M -10 15 Q 0 18 10 22 Q 15 28 11 34 Q 4 37 -4 34 Q -11 28 -15 20 Q -13 16 -10 15 Z" 
+          fill="#1E40AF" opacity="0.5"/>
+    
+    <!-- Ocean Details -->
+    <ellipse cx="-15" cy="-8" rx="8" ry="10" fill="#1565C0" opacity="0.3"/>
+    <ellipse cx="20" cy="5" rx="6" ry="8" fill="#1565C0" opacity="0.3"/>
+    
+    <!-- Ice Caps -->
+    <ellipse cx="0" cy="-48" rx="11" ry="5" fill="#FFFFFF" opacity="0.8"/>
+    <ellipse cx="0" cy="48" rx="13" ry="6" fill="#FFFFFF" opacity="0.8"/>
+    
+    <!-- Cloud Layers -->
+    <path d="M -32 -25 Q -25 -28 -18 -25 Q -12 -22 -8 -25" 
+          fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.5" stroke-linecap="round"/>
+    <path d="M 25 28 Q 30 25 35 28 Q 38 31 40 28" 
+          fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.5" stroke-linecap="round"/>
+    
+    <!-- Atmospheric Glow -->
+    <circle cx="0" cy="0" r="62" fill="none" stroke="#7EC8E3" stroke-width="1.5" opacity="0.4" filter="url(#softGlow)"/>
+    <circle cx="0" cy="0" r="64" fill="none" stroke="#7EC8E3" stroke-width="0.8" opacity="0.2" filter="url(#softGlow)"/>
+    
+    <!-- Asteroids on Orbit -->
+    
+    <!-- Asteroid 1 - Top (Hazardous - Red) -->
+    <g>
+      <circle cx="0" cy="-120" r="11" fill="url(#asteroidRed)" filter="url(#glow)"/>
+      <circle cx="-2" cy="-122" r="2.5" fill="#B71C1C" opacity="0.6"/>
+      <circle cx="2" cy="-119" r="1.8" fill="#B71C1C" opacity="0.5"/>
+      <!-- Tracking Line -->
+      <line x1="0" y1="-109" x2="0" y2="-65" stroke="#FF6B6B" stroke-width="1" opacity="0.4" stroke-dasharray="3 3"/>
+      <!-- Danger Ring -->
+      <circle cx="0" cy="-120" r="17" fill="none" stroke="#FF6B6B" stroke-width="1.5" opacity="0.5" stroke-dasharray="3 3"/>
+    </g>
+    
+    <!-- Asteroid 2 - Right (Warning - Orange) -->
+    <g>
+      <circle cx="85" cy="85" r="9" fill="url(#asteroidOrange)" filter="url(#glow)"/>
+      <circle cx="83" cy="84" r="2" fill="#E65100" opacity="0.6"/>
+      <circle cx="87" cy="86" r="1.5" fill="#E65100" opacity="0.5"/>
+      <!-- Tracking Line -->
+      <line x1="77" y1="77" x2="43" y2="43" stroke="#FFA726" stroke-width="1" opacity="0.4" stroke-dasharray="3 3"/>
+      <!-- Warning Ring -->
+      <circle cx="85" cy="85" r="14" fill="none" stroke="#FFA726" stroke-width="1.2" opacity="0.45" stroke-dasharray="4 2"/>
+    </g>
+    
+    <!-- Asteroid 3 - Bottom Left (Safe - Purple) -->
+    <g>
+      <circle cx="-105" cy="-50" r="7" fill="url(#asteroidPurple)" filter="url(#softGlow)"/>
+      <circle cx="-106" cy="-51" r="1.5" fill="#4527A0" opacity="0.6"/>
+      <circle cx="-104" cy="-49" r="1.2" fill="#4527A0" opacity="0.5"/>
+      <!-- Tracking Line -->
+      <line x1="-99" y1="-47" x2="-43" y2="-33" stroke="#7C4DFF" stroke-width="1" opacity="0.4" stroke-dasharray="3 3"/>
+      <!-- Safe Ring -->
+      <circle cx="-105" cy="-50" r="11" fill="none" stroke="#7C4DFF" stroke-width="1" opacity="0.4" stroke-dasharray="5 2"/>
+    </g>
+    
+    <!-- Smaller Asteroids -->
+    <circle cx="50" cy="-100" r="5" fill="#FFD54F" opacity="0.85" filter="url(#softGlow)"/>
+    <circle cx="-90" cy="60" r="4" fill="#80DEEA" opacity="0.8"/>
+    <circle cx="110" cy="30" r="5.5" fill="#FFB74D" opacity="0.85" filter="url(#softGlow)"/>
+    
+    <!-- Center Targeting System -->
+    <circle cx="0" cy="0" r="75" fill="none" stroke="#00D4FF" stroke-width="1.2" opacity="0.4"/>
+    <circle cx="0" cy="0" r="77" fill="none" stroke="#00D4FF" stroke-width="0.6" opacity="0.25"/>
+    
+    <!-- Crosshair Markers -->
+    <rect x="-85" y="-1.5" width="12" height="3" fill="#00D4FF" opacity="0.7"/>
+    <rect x="73" y="-1.5" width="12" height="3" fill="#00D4FF" opacity="0.7"/>
+    <rect x="-1.5" y="-85" width="3" height="12" fill="#00D4FF" opacity="0.7"/>
+    <rect x="-1.5" y="73" width="3" height="12" fill="#00D4FF" opacity="0.7"/>
+    
+    <!-- Diagonal Crosshair Marks -->
+    <line x1="-53" y1="-53" x2="-46" y2="-46" stroke="#00D4FF" stroke-width="2" opacity="0.5"/>
+    <line x1="46" y1="-53" x2="53" y2="-46" stroke="#00D4FF" stroke-width="2" opacity="0.5"/>
+    <line x1="-53" y1="46" x2="-46" y2="53" stroke="#00D4FF" stroke-width="2" opacity="0.5"/>
+    <line x1="46" y1="46" x2="53" y2="53" stroke="#00D4FF" stroke-width="2" opacity="0.5"/>
+    
+  </g>
+  
+
+</svg>

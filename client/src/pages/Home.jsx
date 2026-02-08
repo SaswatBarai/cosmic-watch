@@ -14,7 +14,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { lazy, Suspense } from 'react';
-const GlobeAsteroid = lazy(() => import('../components/GlobeAsteroid'));
+const SatelliteEarthView = lazy(() => import('../components/SatelliteEarthView'));
 
 const Home = () => {
   return (
@@ -42,7 +42,7 @@ const Home = () => {
 
               <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
                 <span className="block text-white">Monitor</span>
-                <span className="block gradient-text mt-1">Cosmic Threats</span>
+                <span className="block gradient-text mt-1">Near-Earth Objects</span>
               </h1>
               <div className="headline-underline-wide mt-4" />
 
@@ -103,10 +103,10 @@ const Home = () => {
               <Suspense fallback={
                 <div className="w-full h-full flex flex-col items-center justify-center gap-3">
                   <div className="w-20 h-20 rounded-full border-2 border-white/10 border-t-accent-purple animate-spin" />
-                  <span className="text-xs text-gray-500">Loading 3D scene...</span>
+                  <span className="text-xs text-gray-500">Loading satellite view...</span>
                 </div>
               }>
-                <GlobeAsteroid className="w-full h-full" />
+                <SatelliteEarthView className="w-full h-full" />
               </Suspense>
             </div>
           </div>
@@ -231,13 +231,16 @@ const Home = () => {
                   { label: 'Threat Level', value: '2', icon: Zap, iconClass: 'text-red-400' },
                   { label: 'Safe', value: '22', icon: Shield, iconClass: 'text-green-400' },
                   { label: 'Closest', value: '4.2M km', icon: Activity, iconClass: 'text-amber-400' },
-                ].map(({ label, value, icon: Icon, iconClass }) => (
-                  <div key={label} className="rounded-xl border border-white/10 bg-white/[0.05] p-4 hover:border-white/20 hover:bg-white/[0.08] transition-all duration-200">
-                    <p className="text-xs text-gray-500 mb-1">{label}</p>
-                    <p className="font-heading text-2xl font-bold text-white">{value}</p>
-                    <Icon size={16} className={`mt-2 ${iconClass}`} />
-                  </div>
-                ))}
+                ].map(({ label, value, icon, iconClass }) => {
+                  const Icon = icon;
+                  return (
+                    <div key={label} className="rounded-xl border border-white/10 bg-white/[0.05] p-4 hover:border-white/20 hover:bg-white/[0.08] transition-all duration-200">
+                      <p className="text-xs text-gray-500 mb-1">{label}</p>
+                      <p className="font-heading text-2xl font-bold text-white">{value}</p>
+                      <Icon size={16} className={`mt-2 ${iconClass}`} />
+                    </div>
+                  );
+                })}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 {[
@@ -289,20 +292,23 @@ const Home = () => {
                 { step: 1, title: 'We fetch NeoWs data', body: "Our backend pulls the latest NEO data from NASA's NeoWs API and normalizes it for the dashboard.", icon: Satellite },
                 { step: 2, title: 'We compute risk', body: 'Each object gets a risk score from size, speed, and miss distance. High-risk objects are flagged automatically.', icon: Shield },
                 { step: 3, title: 'You monitor & act', body: 'Use the dashboard to browse objects, check approach dates, and add items to your watchlist. Alerts keep you in the loop.', icon: LayoutDashboard },
-              ].map(({ step, title, body, icon: Icon }) => (
-                <div key={step} className="relative flex gap-6 md:gap-8 items-start">
-                  <div className="shrink-0 w-14 h-14 rounded-2xl bg-accent-purple/20 text-accent-purple font-heading font-bold text-xl flex items-center justify-center border-2 border-accent-purple/30">
-                    {step}
-                  </div>
-                  <div className="flex-1 pb-12 md:pb-20">
-                    <h3 className="font-heading text-xl font-bold text-white mb-2 flex items-center gap-2">
-                      <Icon size={20} className="text-accent-purple/80" />
+              ].map(({ step, title, body, icon }) => {
+                const Icon = icon;
+                return (
+                  <div key={step} className="relative flex gap-6 md:gap-8 items-start">
+                    <div className="shrink-0 w-14 h-14 rounded-2xl bg-accent-purple/20 text-accent-purple font-heading font-bold text-xl flex items-center justify-center border-2 border-accent-purple/30">
+                      {step}
+                    </div>
+                    <div className="flex-1 pb-12 md:pb-20">
+                      <h3 className="font-heading text-xl font-bold text-white mb-2 flex items-center gap-2">
+                        <Icon size={20} className="text-accent-purple/80" />
                       {title}
                     </h3>
-                    <p className="text-gray-400 leading-relaxed">{body}</p>
+                      <p className="text-gray-400 leading-relaxed">{body}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -316,7 +322,7 @@ const Home = () => {
             Why Space Situational Awareness Matters
           </h2>
           <p className="text-gray-300 text-lg md:text-xl leading-relaxed mb-8">
-            Thousands of asteroids pass near Earth every year. Most pose no threat—but early detection and tracking are the backbone of planetary defense. Cosmic Watch puts NASA's public data in one place so researchers, educators, and curious minds can understand what's out there.
+            Thousands of asteroids pass near Earth every year. Most pose no threat—but early detection and tracking are the backbone of planetary defense. Perilux puts NASA's public data in one place so researchers, educators, and curious minds can understand what's out there.
           </p>
           <div className="inline-flex items-center gap-4 px-6 py-4 rounded-2xl border border-white/10 bg-white/[0.04] mb-10">
             <span className="font-heading text-3xl font-bold text-accent-purple">100%</span>
@@ -369,11 +375,13 @@ const Home = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 md:gap-8 mb-10 sm:mb-16">
             <div className="col-span-2 md:col-span-1">
               <Link to="/" className="inline-flex items-center gap-2 mb-5 group">
-                <div className="p-2 rounded-xl bg-accent-purple/20 border border-accent-purple/30 group-hover:shadow-[0_0_20px_-8px_rgba(139,92,246,0.4)] transition-shadow">
-                  <Rocket className="text-accent-purple h-5 w-5" />
-                </div>
+                <img 
+                  src="/cosmic-watch-logo-icon.svg" 
+                  alt="Perilux Logo" 
+                  className="h-9 w-9 group-hover:scale-110 transition-transform duration-200"
+                />
                 <span className="font-heading font-bold text-lg text-white">
-                  Cosmic<span className="text-accent-purple">Watch</span>
+                  Peri<span className="text-accent-purple">lux</span>
                 </span>
               </Link>
               <p className="text-sm text-gray-500 leading-relaxed">
@@ -412,7 +420,7 @@ const Home = () => {
 
           <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-gray-500 text-center sm:text-left">
-              © {new Date().getFullYear()} Cosmic Watch. Not affiliated with NASA. Data from NASA Open APIs.
+              © {new Date().getFullYear()} Perilux. Not affiliated with NASA. Data from NASA Open APIs.
             </p>
             <div className="flex items-center gap-6">
               <a href="https://github.com/saswatbarai/cosmic-watch" target="_blank" rel="noreferrer" className="text-gray-500 hover:text-white transition-colors" aria-label="GitHub">

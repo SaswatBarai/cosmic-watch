@@ -10,25 +10,6 @@ const EARTH_SPEC  = 'https://unpkg.com/three-globe@2.31.0/example/img/earth-wate
 const EARTH_NIGHT = 'https://unpkg.com/three-globe@2.31.0/example/img/earth-night.jpg';
 
 
-const atmosphereVertex = `
-  varying vec3 vNormal;
-  varying vec3 vPosition;
-  void main() {
-    vNormal = normalize(normalMatrix * normal);
-    vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`;
-
-const atmosphereFragment = `
-  varying vec3 vNormal;
-  varying vec3 vPosition;
-  void main() {
-    float intensity = pow(0.7 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 3.0);
-    vec3 color = mix(vec3(0.1, 0.4, 1.0), vec3(0.3, 0.7, 1.0), intensity);
-    gl_FragColor = vec4(color, intensity * 1.2);
-  }
-`;
 
 
 function EarthTextured() {
@@ -52,15 +33,6 @@ function EarthTextured() {
     if (earthRef.current) earthRef.current.rotation.y += delta * 0.06;
     if (cloudRef.current) cloudRef.current.rotation.y += delta * 0.08;
   });
-
-  const atmosphereMat = useMemo(() => new THREE.ShaderMaterial({
-    vertexShader: atmosphereVertex,
-    fragmentShader: atmosphereFragment,
-    blending: THREE.AdditiveBlending,
-    side: THREE.BackSide,
-    transparent: true,
-    depthWrite: false,
-  }), []);
 
   return (
     <group>
@@ -184,11 +156,13 @@ function Asteroid({ orbitRadius, speed, angleOffset, size, yTilt, inclination = 
     const count = 20;
     const positions = new Float32Array(count * 3);
     const sizes = new Float32Array(count);
+    // Use deterministic sizes based on index instead of random
     for (let i = 0; i < count; i++) {
       positions[i * 3] = 0;
       positions[i * 3 + 1] = 0;
       positions[i * 3 + 2] = 0;
-      sizes[i] = Math.random() * 0.02 + 0.005;
+      // Deterministic size variation based on index
+      sizes[i] = 0.005 + (i % 10) * 0.002;
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(positions, 3));

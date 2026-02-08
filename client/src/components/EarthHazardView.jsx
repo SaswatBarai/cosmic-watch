@@ -57,17 +57,24 @@ function getHazardConfig(riskScore, isHazardous, distance) {
   };
 }
 
+// Generate star positions outside component to avoid impure render
+const generateStarPositions = () => {
+  const starCount = 5000;
+  const positions = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount * 3; i++) {
+    positions[i] = (Math.random() - 0.5) * 400;
+  }
+  return positions;
+};
+
+const STAR_POSITIONS = generateStarPositions();
+
 function BrightStarfield() {
   const starsRef = useRef(null);
   
   const starGeometry = useMemo(() => {
-    const starCount = 5000;
-    const positions = new Float32Array(starCount * 3);
-    for (let i = 0; i < starCount * 3; i++) {
-      positions[i] = (Math.random() - 0.5) * 400;
-    }
     const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('position', new THREE.BufferAttribute(STAR_POSITIONS, 3));
     return geo;
   }, []);
 
@@ -369,22 +376,29 @@ function WarningRings({ config }) {
   );
 }
 
+// Generate danger particles outside to avoid impure render
+const generateDangerParticles = () => {
+  const count = 100;
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const radius = 2.5 + Math.random() * 1.5;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.random() * Math.PI;
+    positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+    positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+    positions[i * 3 + 2] = radius * Math.cos(phi);
+  }
+  return positions;
+};
+
+const DANGER_PARTICLES = generateDangerParticles();
+
 function DangerParticles({ config }) {
   const particlesRef = useRef(null);
   
   const particles = useMemo(() => {
     if (config.level < 2) return null;
-    const count = 100;
-    const positions = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      const radius = 2.5 + Math.random() * 1.5;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.random() * Math.PI;
-      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-      positions[i * 3 + 2] = radius * Math.cos(phi);
-    }
-    return positions;
+    return DANGER_PARTICLES;
   }, [config.level]);
 
   useFrame((state) => {

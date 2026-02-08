@@ -77,7 +77,7 @@ const AsteroidDetail = () => {
   };
 
   const handleShare = () => {
-    const text = `Check out asteroid ${asteroid?.name} on Cosmic Watch! Risk Score: ${asteroid?.riskScore}`;
+    const text = `Check out asteroid ${asteroid?.name} on Perilux! Risk Score: ${asteroid?.riskScore}`;
     navigator.clipboard.writeText(text);
     alert('Asteroid details copied to clipboard!');
   };
@@ -99,7 +99,7 @@ const AsteroidDetail = () => {
       }
       try {
         await refreshUser();
-      } catch (e) {
+      } catch {
         /* ignore */
       }
     } catch (err) {

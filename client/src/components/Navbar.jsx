@@ -35,11 +35,13 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16 md:h-[4.25rem]">
           <Link to="/" className="flex items-center gap-2.5 group" onClick={closeMobileMenu}>
-            <div className="p-1.5 sm:p-2 rounded-xl bg-accent-purple/20 border border-accent-purple/30 group-hover:bg-accent-purple/30 group-hover:border-accent-purple/50 group-hover:shadow-[0_0_20px_-8px_rgba(139,92,246,0.4)] transition-all duration-200">
-              <Rocket className="text-accent-purple h-4 w-4 sm:h-5 sm:w-5" />
-            </div>
+            <img 
+              src="/cosmic-watch-logo-icon.svg" 
+              alt="Perilux Logo" 
+              className="h-8 w-8 sm:h-10 sm:w-10 group-hover:scale-110 transition-transform duration-200"
+            />
             <span className="font-heading font-bold text-base sm:text-lg tracking-tight text-white">
-              Cosmic<span className="text-accent-purple">Watch</span>
+              Peri<span className="text-accent-purple">lux</span>
             </span>
           </Link>
 

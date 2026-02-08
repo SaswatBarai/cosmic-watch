@@ -68,7 +68,13 @@ export default function StatCard({
   trendValue,
 }) {
   const styles = variantStyles[variant] ?? variantStyles.neutral;
-  const TrendIcon = trend ? getTrendIcon(trend) : null;
+  
+  // Render trend icon directly without creating component
+  const renderTrendIcon = () => {
+    if (!trend) return null;
+    const IconComponent = getTrendIcon(trend);
+    return <IconComponent className="h-3 w-3" />;
+  };
 
   return (
     <div
@@ -104,7 +110,7 @@ export default function StatCard({
               )}
               {trend && trendValue && (
                 <span className={`inline-flex items-center gap-1 text-xs font-medium ${styles.trend}`}>
-                  {TrendIcon && <TrendIcon className="h-3 w-3" />}
+                  {renderTrendIcon()}
                   {trendValue}
                 </span>
               )}

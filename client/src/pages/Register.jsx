@@ -30,7 +30,7 @@ const Register = () => {
             <Rocket className="w-6 h-6 text-blue-400" />
           </div>
           <CardTitle className="text-2xl font-bold text-white">Join the Network</CardTitle>
-          <CardDescription>Create your Cosmic Watch access profile</CardDescription>
+          <CardDescription>Create your Perilux access profile</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

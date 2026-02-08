@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const res = await api.get('/auth/me');
         setUser(res.data);
-      } catch (err) {
+      } catch {
         setUser(null);
       } finally {
         setLoading(false);
@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
       const res = await api.get('/auth/me');
       setUser(res.data);
       return res.data;
-    } catch (err) {
+    } catch {
       setUser(null);
       return null;
     }

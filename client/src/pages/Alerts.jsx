@@ -33,7 +33,7 @@ const Alerts = () => {
       await api.put('/auth/preferences', preferences);
       setMessage('Preferences saved successfully!');
       setTimeout(() => setMessage(''), 3000);
-    } catch (err) {
+    } catch {
       setMessage('Failed to save preferences.');
     }
   };

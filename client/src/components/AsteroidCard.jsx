@@ -39,14 +39,13 @@ const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
   };
 
   const handleShare = (e) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(`Check out asteroid ${data.name} on Cosmic Watch! Risk Score: ${data.riskScore}`);
+    e?.stopPropagation();
+    navigator.clipboard.writeText(`Check out asteroid ${data.name} on Perilux! Risk Score: ${data.riskScore}`);
     alert("Asteroid details copied to clipboard!");
   };
 
   const handleToggleWatchlist = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e?.stopPropagation();
 
     if (!user) {
       alert('Please login to access the Deep Space Network database.');
@@ -65,7 +64,7 @@ const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
       }
       // refresh global user/watchlist so other cards update
       
-      try { await refreshUser(); } catch (e) { /* ignore */ }
+      try { await refreshUser(); } catch { /* ignore */ }
     } catch (error) {
       console.error('Watchlist error:', error);
       alert('Failed to update database. Connection unstable.');
@@ -75,8 +74,7 @@ const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
   };
 
   const handleRemove = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e?.stopPropagation();
     if (!user) {
       alert('Please login to modify your watchlist.');
       return;
@@ -86,7 +84,7 @@ const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
       const asteroidId = data.id || data._id || data.nasaId;
       await api.delete(`/watchlist/${asteroidId}`);
       // refresh context
-      try { await refreshUser(); } catch (e) { /* ignore */ }
+      try { await refreshUser(); } catch { /* ignore */ }
       if (typeof onRemoved === 'function') onRemoved(asteroidId);
     } catch (err) {
       console.error('Remove error', err);
@@ -220,10 +218,7 @@ const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
 
         <div className="flex items-center gap-2 pt-3 border-t border-white/10 mt-3">
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsExpanded(!isExpanded);
-            }}
+            onClick={() => setIsExpanded(!isExpanded)}
             className="flex items-center gap-2 text-xs text-gray-500 hover:text-accent-purple py-2 px-3 rounded-lg hover:bg-white/5 transition-all flex-1"
           >
             <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
@@ -232,10 +227,7 @@ const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
 
             <div className="flex items-center gap-1">
              <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleShare(e);
-              }}
+              onClick={handleShare}
               className="flex items-center justify-center text-xs py-2 px-3 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 border border-white/10 transition-all"
               title="Share"
             >
@@ -243,10 +235,7 @@ const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
             </button>
             {showRemove ? (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemove(e);
-                }}
+                onClick={handleRemove}
                 disabled={isLoading}
                 className={`
                   flex items-center gap-2 text-xs py-2 px-3 rounded-lg
@@ -259,10 +248,7 @@ const AsteroidCard = ({ data, showRemove = false, onRemoved }) => {
               </button>
             ) : user ? (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleToggleWatchlist(e);
-                }}
+                onClick={handleToggleWatchlist}
                 disabled={isLoading}
                 className={`
                   flex items-center gap-2 text-xs py-2 px-3 rounded-lg
