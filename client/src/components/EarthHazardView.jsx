@@ -9,7 +9,7 @@ const EARTH_SPEC = 'https://unpkg.com/three-globe@2.31.0/example/img/earth-water
 const EARTH_NIGHT = 'https://unpkg.com/three-globe@2.31.0/example/img/earth-night.jpg';
 
 function getHazardConfig(riskScore, isHazardous, distance) {
-  // Scale distance: closer asteroids in real data = higher risk visualization
+  
   const distanceScale = distance ? Math.max(2.5, Math.min(5.5, distance / 10000000)) : 3.5;
   
   if (riskScore > 75 || (isHazardous && riskScore > 50)) {
@@ -57,7 +57,6 @@ function getHazardConfig(riskScore, isHazardous, distance) {
   };
 }
 
-// Generate star positions outside component to avoid impure render
 const generateStarPositions = () => {
   const starCount = 5000;
   const positions = new Float32Array(starCount * 3);
@@ -78,14 +77,14 @@ function BrightStarfield() {
     return geo;
   }, []);
 
-  // Create circular star texture
+ 
   const starTexture = useMemo(() => {
     const canvas = document.createElement('canvas');
     canvas.width = 32;
     canvas.height = 32;
     const ctx = canvas.getContext('2d');
     
-    // Create radial gradient for smooth circular star
+  
     const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
     gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
     gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
@@ -128,7 +127,7 @@ function Earth() {
     emissiveMap: EARTH_NIGHT,
   });
 
-  // Configure textures for maximum quality
+  
   Object.values(textures).forEach((tex) => {
     tex.anisotropy = 16;
     tex.colorSpace = THREE.SRGBColorSpace;
@@ -136,7 +135,7 @@ function Earth() {
     tex.magFilter = THREE.LinearFilter;
   });
 
-  // Realistic atmosphere shader (inspired by professional satellite feeds)
+  
   const atmosphereMat = useMemo(
     () =>
       new THREE.ShaderMaterial({
@@ -169,7 +168,7 @@ function Earth() {
 
   return (
     <group>
-      {/* Earth surface - satellite feed quality */}
+    
       <mesh ref={earthRef} castShadow receiveShadow>
         <sphereGeometry args={[1.2, 128, 128]} />
         <meshPhongMaterial
@@ -185,7 +184,7 @@ function Earth() {
         />
       </mesh>
 
-      {/* Cloud layer */}
+   
       <mesh ref={cloudsRef}>
         <sphereGeometry args={[1.21, 96, 96]} />
         <meshPhongMaterial
@@ -198,7 +197,7 @@ function Earth() {
         />
       </mesh>
 
-      {/* Atmosphere glow */}
+    
       <mesh ref={atmosphereRef} scale={1.1}>
         <sphereGeometry args={[1.2, 96, 96]} />
         <primitive object={atmosphereMat} attach="material" />
@@ -211,33 +210,29 @@ function HazardAsteroid({ config, diameter, velocity }) {
   const asteroidRef = useRef(null);
   const trailRef = useRef(null);
 
-  // Realistic size scaling based on actual diameter data
+
   const size = useMemo(() => {
     if (!diameter || diameter === 0) {
       // Default if no data - larger default
       return 0.25;
     }
     
-    // Earth radius = 1.2 units in scene = 6371 km
+  
     const earthRadiusUnits = 1.2;
     const earthRadiusKm = 6371;
     const diameterKm = diameter / 1000; // meters to kilometers
     
-    // Calculate proportional size
+    
     const proportionalSize = (diameterKm / earthRadiusKm) * earthRadiusUnits;
     
-    // Scale up for visibility (asteroids are tiny compared to Earth)
-    // Multiply by 150 for better visibility while maintaining relative proportions
+    
     const visibleSize = proportionalSize * 150;
     
-    // Clamp between min/max for practical visibility
-    // Min: 0.12 (tiny asteroids like 50m)
-    // Max: 0.7 (huge asteroids like 10km)
     return Math.max(0.12, Math.min(0.7, visibleSize));
   }, [diameter]);
 
   const geometry = useMemo(() => {
-    // Create highly irregular asteroid shape with craters
+   
     const geo = new THREE.IcosahedronGeometry(size, 3);
     const pos = geo.attributes.position;
     const v = new THREE.Vector3();
@@ -246,19 +241,19 @@ function HazardAsteroid({ config, diameter, velocity }) {
       v.set(pos.getX(i), pos.getY(i), pos.getZ(i));
       const len = v.length();
       
-      // Multi-layer noise for realistic rocky surface
+     
       const n1 = Math.sin(i * 4.3 + v.x * 15) * Math.cos(i * 3.2 + v.z * 12);
       const n2 = Math.sin(i * 7.5 + v.y * 22) * Math.cos(i * 5.8 + v.x * 18);
       const n3 = Math.sin(i * 12.1) * 0.5;
       
-      // Crater simulation
+     
       const crater = Math.sin(i * 2.7) * Math.cos(i * 1.9);
       const craterDepth = crater > 0.7 ? -0.08 : 0;
       
       const displacement = 1 + n1 * 0.22 + n2 * 0.12 + n3 * 0.06 + craterDepth;
       v.normalize().multiplyScalar(len * displacement);
       
-      // Asymmetric squashing for realistic shape
+      
       v.y *= 0.88 + Math.sin(i) * 0.1;
       v.x *= 1.05 + Math.cos(i * 1.3) * 0.08;
       
@@ -269,7 +264,7 @@ function HazardAsteroid({ config, diameter, velocity }) {
     return geo;
   }, [size]);
 
-  // Rotation speed based on real velocity (higher velocity = faster spin impression)
+  
   const rotationSpeed = useMemo(() => {
     const baseSpeed = 0.008;
     const velocityFactor = velocity ? Math.min(2, velocity / 50000) : 1;
@@ -282,14 +277,14 @@ function HazardAsteroid({ config, diameter, velocity }) {
     const angle = t * config.asteroidSpeed;
     const distance = config.asteroidDistance;
     
-    // Elliptical orbit with inclination
+   
     const a = distance;
-    const b = distance * 0.92; // slightly elliptical
+    const b = distance * 0.92; 
     asteroidRef.current.position.x = Math.cos(angle) * a;
     asteroidRef.current.position.z = Math.sin(angle) * b;
     asteroidRef.current.position.y = Math.sin(angle * 0.6 + 0.5) * 0.5;
     
-    // Tumbling rotation (realistic asteroid motion)
+    
     asteroidRef.current.rotation.x += rotationSpeed * 1.3;
     asteroidRef.current.rotation.y += rotationSpeed * 0.9;
     asteroidRef.current.rotation.z += rotationSpeed * 0.6;
@@ -376,7 +371,7 @@ function WarningRings({ config }) {
   );
 }
 
-// Generate danger particles outside to avoid impure render
+
 const generateDangerParticles = () => {
   const count = 100;
   const positions = new Float32Array(count * 3);
@@ -438,13 +433,13 @@ function Scene({ riskScore, isHazardous, diameter, distance, velocity }) {
 
   return (
     <>
-      {/* Bright, visible starfield - satellite feed quality */}
+      
       <BrightStarfield />
       
-      {/* Professional lighting setup */}
+     
       <ambientLight intensity={0.2} color="#404040" />
       
-      {/* Main sun - bright and realistic */}
+     
       <directionalLight 
         position={[-50, 20, 50]} 
         intensity={3.2}
@@ -455,7 +450,7 @@ function Scene({ riskScore, isHazardous, diameter, distance, velocity }) {
         shadow-bias={-0.0001}
       />
       
-      {/* Subtle fill light */}
+  
       <pointLight position={[20, 10, -30]} intensity={0.3} color="#6688aa" distance={50} />
       
       <Earth />
@@ -467,7 +462,7 @@ function Scene({ riskScore, isHazardous, diameter, distance, velocity }) {
       />
       <DangerParticles config={config} />
 
-      {/* Subtle glow around Earth based on threat level */}
+    
       <Sphere args={[1.38, 32, 32]}>
         <meshBasicMaterial
           color={config.glowColor}

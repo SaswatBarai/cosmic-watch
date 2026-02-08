@@ -69,7 +69,7 @@ export default function StatCard({
 }) {
   const styles = variantStyles[variant] ?? variantStyles.neutral;
   
-  // Render trend icon directly without creating component
+  
   const renderTrendIcon = () => {
     if (!trend) return null;
     const IconComponent = getTrendIcon(trend);
@@ -86,10 +86,10 @@ export default function StatCard({
         ${styles.card}
       `}
     >
-      {/* Top accent bar */}
+     
       <div className={`absolute top-0 left-0 right-0 h-1 ${styles.accentBar} opacity-80`} aria-hidden />
 
-      {/* Animated glow orb */}
+     
       <div
         className={`absolute -top-12 -right-12 h-32 w-32 rounded-full ${styles.accentBar} opacity-20 blur-3xl group-hover:opacity-30 transition-opacity duration-500`}
         aria-hidden

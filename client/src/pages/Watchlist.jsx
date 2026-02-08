@@ -17,14 +17,14 @@ const Watchlist = () => {
           return;
         }
 
-        // If backend returns full asteroid objects, use them directly
+        
         const containsObjects = userWatchlist.every(w => w && w.asteroid && (w.asteroid._id || w.asteroid.nasaId));
         if (containsObjects) {
           setFavorites(userWatchlist.map(w => w.asteroid).filter(Boolean));
           return;
         }
 
-        // Fallback: fetch all asteroids and filter by saved IDs
+     
         const { data: asteroidsData } = await api.get('/asteroids');
         const allAsteroids = Array.isArray(asteroidsData) ? asteroidsData : [];
         const savedIds = userWatchlist.map(w => w.asteroidId || (w.asteroid && (w.asteroid._id || w.asteroid.nasaId)) || w.id).filter(Boolean);

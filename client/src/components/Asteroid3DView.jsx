@@ -3,7 +3,6 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Hazard level: 0 = safe, 1 = warning, 2 = critical
 function getHazardLevel(riskScore, isHazardous) {
   if (riskScore > 75 || isHazardous && riskScore > 50) return 2;
   if (riskScore > 50 || isHazardous) return 1;

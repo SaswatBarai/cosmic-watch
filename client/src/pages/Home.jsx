@@ -54,7 +54,7 @@ const staggerContainer = {
   }
 };
 
-// Scroll animation wrapper component
+
 const ScrollReveal = ({ children, delay = 0, className = '' }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });

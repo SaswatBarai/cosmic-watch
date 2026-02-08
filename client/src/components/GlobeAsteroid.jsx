@@ -156,12 +156,12 @@ function Asteroid({ orbitRadius, speed, angleOffset, size, yTilt, inclination = 
     const count = 20;
     const positions = new Float32Array(count * 3);
     const sizes = new Float32Array(count);
-    // Use deterministic sizes based on index instead of random
+   
     for (let i = 0; i < count; i++) {
       positions[i * 3] = 0;
       positions[i * 3 + 1] = 0;
       positions[i * 3 + 2] = 0;
-      // Deterministic size variation based on index
+   
       sizes[i] = 0.005 + (i % 10) * 0.002;
     }
     const g = new THREE.BufferGeometry();

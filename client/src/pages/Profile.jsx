@@ -58,7 +58,7 @@ const Profile = () => {
   const { user, logout, refreshUser } = useAuth();
   const navigate = useNavigate();
 
-  // Profile edit state
+  
   const [editing, setEditing] = useState(false);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -68,11 +68,11 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState({ text: '', type: '' });
 
-  // Delete state
+  
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Alert prefs state
+ 
   const [prefs, setPrefs] = useState({ minRiskScore: 50, notifyImminent: true, emailFrequency: 'daily' });
   const [prefsLoading, setPrefsLoading] = useState(false);
   const [prefsSaved, setPrefsSaved] = useState(false);
@@ -86,14 +86,14 @@ const Profile = () => {
     setEmail(user.email || '');
   }, [user, navigate]);
 
-  // Load alert preferences
+  
   useEffect(() => {
     const loadPrefs = async () => {
       try {
         const { data } = await api.get('/alerts/preferences');
         if (data) setPrefs(data);
       } catch {
-        // Ignore – use defaults
+        
       }
     };
     if (user) loadPrefs();
@@ -171,7 +171,7 @@ const Profile = () => {
       await logout();
       navigate('/');
     } catch {
-      // Ignore
+     
     }
   };
 
@@ -195,7 +195,7 @@ const Profile = () => {
         initial="hidden"
         animate="visible"
       >
-        {/* Header */}
+        
         <motion.div className="flex flex-col sm:flex-row items-start sm:items-center gap-5" variants={item}>
           <motion.div
             className="h-20 w-20 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-purple-500/20 border-2 border-purple-400/30"
@@ -221,7 +221,7 @@ const Profile = () => {
           </div>
         </motion.div>
 
-        {/* Notification Banner */}
+      
         {msg.text && (
           <motion.div
             initial={{ opacity: 0, y: -12 }}
@@ -247,7 +247,7 @@ const Profile = () => {
           </motion.div>
         )}
 
-        {/* Quick Stats */}
+       
         <motion.div
           className="grid grid-cols-2 sm:grid-cols-4 gap-3"
           variants={container}
@@ -264,7 +264,7 @@ const Profile = () => {
           ))}
         </motion.div>
 
-        {/* Profile Details */}
+      
         <motion.div variants={item}>
           <SectionCard title="Profile Information" icon={User}>
             {!editing ? (
@@ -383,7 +383,7 @@ const Profile = () => {
           </SectionCard>
         </motion.div>
 
-        {/* Alert Preferences */}
+        
         <motion.div variants={item}>
           <SectionCard title="Alert Preferences" icon={Bell}>
             <div className="space-y-4">
@@ -445,7 +445,7 @@ const Profile = () => {
           </SectionCard>
         </motion.div>
 
-        {/* Watchlist Summary */}
+      
         <motion.div variants={item}>
           <SectionCard title="Watchlist" icon={Star}>
             {watchlistCount > 0 ? (
@@ -500,7 +500,7 @@ const Profile = () => {
           </SectionCard>
         </motion.div>
 
-        {/* Account Actions */}
+       
         <motion.div variants={item}>
           <SectionCard title="Account" icon={Shield}>
             <div className="space-y-3">

@@ -15,9 +15,8 @@ import { addMessage, getMessages } from './services/asteroidChatStore.js';
 dotenv.config();
 
 const app = express();
-const httpServer = createServer(app); // Initialize HTTP server
+const httpServer = createServer(app); 
 
-// Configure Socket.io with CORS
 const io = new Server(httpServer, {
     cors: {
         origin: [process.env.CLIENT_URL || 'http://localhost:5173', 'http://localhost:5174'],
@@ -50,7 +49,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-// Request logging (so Docker logs show every API call)
+
 app.use((req, res, next) => {
   const start = Date.now();
   res.on('finish', () => {
@@ -60,11 +59,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Track active users per asteroid room
-const roomUsers = new Map(); // Map<asteroidId, Set<{socketId, userId, userName}>>
-const userTyping = new Map(); // Map<asteroidId, Set<userId>>
 
-// Helper function to get users in a room
+const roomUsers = new Map(); 
+const userTyping = new Map(); 
+
 function getRoomUsers(asteroidId) {
     if (!roomUsers.has(asteroidId)) {
         roomUsers.set(asteroidId, new Set());
@@ -72,11 +70,11 @@ function getRoomUsers(asteroidId) {
     return Array.from(roomUsers.get(asteroidId));
 }
 
-// Socket.io Connection Logic
+
 io.on('connection', (socket) => {
     console.log('User connected to chat:', socket.id);
 
-    // Join a specific asteroid's chat room
+    
     socket.on('join_asteroid', async (data) => {
         const { asteroidId, userId, userName } = data || {};
         
@@ -88,18 +86,18 @@ io.on('connection', (socket) => {
         try {
             socket.join(asteroidId);
             
-            // Add user to room tracking
+           
             const users = roomUsers.get(asteroidId) || new Set();
             users.add({ socketId: socket.id, userId, userName });
             roomUsers.set(asteroidId, users);
 
-            // Fetch recent messages from database
+            
             const messages = await getMessages(asteroidId, 100);
             
-            // Send recent messages to the joining user
+           
             socket.emit('load_messages', messages);
             
-            // Notify other users in the room
+           
             const activeUsers = getRoomUsers(asteroidId);
             io.to(asteroidId).emit('user_joined', { 
                 userName, 
@@ -114,7 +112,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Handle sending real-time messages
+    
     socket.on('send_message', async (data) => {
         const { asteroidId, userId, userName, text } = data || {};
         
@@ -124,15 +122,12 @@ io.on('connection', (socket) => {
         }
 
         try {
-            // Add message to database
             const msg = await addMessage(asteroidId, { userId, userName, text });
             
-            // Clear typing indicator when message is sent
             if (userTyping.has(asteroidId)) {
                 userTyping.get(asteroidId).delete(userId);
             }
             
-            // Broadcast the message to all users in that asteroid's room
             io.to(asteroidId).emit('receive_message', msg);
         } catch (err) {
             console.error('Error sending message:', err);
@@ -140,7 +135,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Handle typing indicators
+    
     socket.on('typing', (data) => {
         const { asteroidId, userId, userName, isTyping } = data || {};
         
@@ -157,7 +152,7 @@ io.on('connection', (socket) => {
             }
         }
 
-        // Broadcast typing status to room (except sender)
+       
         socket.broadcast.to(asteroidId).emit('user_typing', {
             userId,
             userName,
@@ -166,7 +161,7 @@ io.on('connection', (socket) => {
         });
     });
 
-    // Leave asteroid room
+   
     socket.on('leave_asteroid', (data) => {
         const { asteroidId, userName } = data || {};
         
@@ -174,7 +169,6 @@ io.on('connection', (socket) => {
 
         socket.leave(asteroidId);
 
-        // Remove user from tracking
         if (roomUsers.has(asteroidId)) {
             const users = roomUsers.get(asteroidId);
             users.forEach(user => {
@@ -183,7 +177,7 @@ io.on('connection', (socket) => {
             if (users.size === 0) roomUsers.delete(asteroidId);
         }
 
-        // Notify others
+       
         const activeUsers = getRoomUsers(asteroidId);
         io.to(asteroidId).emit('user_left', {
             userName,
@@ -194,9 +188,9 @@ io.on('connection', (socket) => {
         console.log(`User ${socket.id} left room: ${asteroidId}`);
     });
 
-    // Handle disconnect
+   
     socket.on('disconnect', () => {
-        // Remove user from all rooms
+       
         roomUsers.forEach((users, asteroidId) => {
             let removedUser = null;
             users.forEach(user => {
@@ -222,7 +216,7 @@ io.on('connection', (socket) => {
     });
 });
 
-// API Routes
+
 app.get('/', (req, res) => {
     res.status(200).json({ 
         message: 'Cosmic Watch Backend Running', 
@@ -237,7 +231,7 @@ app.use('/api/alerts', alertRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-// Start httpServer – connect to DB first, then start listening
+
 const startServer = async () => {
     try {
         await connectDB();

@@ -155,7 +155,7 @@ const Dashboard = () => {
           <p className="text-sm text-gray-500 mt-1">Real-time NEO tracking powered by NASA</p>
         </div>
         
-        {/* --- CONTROLS SECTION --- */}
+        
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs sm:text-sm text-gray-500 font-mono tabular-nums bg-white/[0.04] border border-white/10 px-2.5 sm:px-3 py-1.5 rounded-lg">
             {new Date().toLocaleTimeString()}
@@ -193,7 +193,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* --- CONDITIONAL RENDER --- */}
+      
       {showSettings && (
         <div className="animate-in slide-in-from-top-4 duration-300">
           <AlertSettings />

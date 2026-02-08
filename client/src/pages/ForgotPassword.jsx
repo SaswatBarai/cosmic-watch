@@ -5,7 +5,7 @@ import { Rocket, ArrowRight, Mail, Lock, Check, AlertTriangle } from 'lucide-rea
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 
 const ForgotPassword = () => {
-  const [step, setStep] = useState(1); // 1 = enter email, 2 = enter OTP + new password
+  const [step, setStep] = useState(1); 
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -90,7 +90,7 @@ const ForgotPassword = () => {
         </CardHeader>
 
         <CardContent>
-          {/* Message Banner */}
+         
           {msg.text && (
             <div className={`flex items-center gap-2 p-3 rounded-lg text-sm mb-4 ${
               msg.type === 'success' 
@@ -103,7 +103,7 @@ const ForgotPassword = () => {
           )}
 
           {step === 1 ? (
-            // Step 1: Enter Email
+           
             <form onSubmit={handleSendOTP} className="space-y-4">
               <div>
                 <label className="block text-sm text-gray-400 mb-2">Email Address</label>
@@ -143,7 +143,7 @@ const ForgotPassword = () => {
               </div>
             </form>
           ) : (
-            // Step 2: Enter OTP + New Password
+           
             <form onSubmit={handleResetPassword} className="space-y-4">
               <div>
                 <label className="block text-sm text-gray-400 mb-2">6-Digit Code</label>

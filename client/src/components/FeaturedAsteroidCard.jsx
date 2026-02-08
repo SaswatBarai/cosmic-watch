@@ -21,15 +21,15 @@ export default function FeaturedAsteroidCard({ data }) {
       onClick={handleCardClick}
       className="relative overflow-hidden rounded-2xl border-2 border-red-500/40 bg-gradient-to-br from-red-500/15 via-red-500/5 to-transparent glass-card shadow-[0_0_40px_-12px_rgba(239,68,68,0.4)] cursor-pointer transition-all duration-300 hover:border-red-500/60 hover:shadow-[0_0_50px_-10px_rgba(239,68,68,0.5)]"
     >
-      {/* Alert banner */}
+   
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-red-400 to-red-500 animate-pulse" />
       
-      {/* Glow orbs */}
+      
       <div className="absolute top-0 right-0 h-64 w-64 rounded-full bg-red-500/20 blur-3xl opacity-40" aria-hidden />
       <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-red-500/10 blur-3xl opacity-30" aria-hidden />
 
       <div className="relative p-5 sm:p-6 md:p-8">
-        {/* Header */}
+       
         <div className="flex items-start justify-between gap-4 mb-6">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 mb-2">
@@ -53,7 +53,7 @@ export default function FeaturedAsteroidCard({ data }) {
           </Badge>
         </div>
 
-        {/* Risk score - large prominent display */}
+       
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -71,7 +71,7 @@ export default function FeaturedAsteroidCard({ data }) {
           </div>
         </div>
 
-        {/* Key metrics grid */}
+   
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           <div className="rounded-xl border border-white/10 bg-white/[0.06] p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -116,7 +116,7 @@ export default function FeaturedAsteroidCard({ data }) {
           </div>
         </div>
 
-        {/* Hazard warning */}
+    
         {data.isHazardous && (
           <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
             <p className="text-xs text-red-300 flex items-center gap-2">

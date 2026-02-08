@@ -75,7 +75,6 @@ router.post('/logout', (req, res) => {
   res.json({ msg: 'Logged out successfully' });
 });
 
-// Update profile
 router.put('/profile', auth, async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -86,7 +85,6 @@ router.put('/profile', auth, async (req, res) => {
 
     const { username, email, currentPassword, newPassword } = req.body;
 
-    // Update username
     if (username && username !== user.username) {
       const existing = await User.findOne({ username });
       if (existing && String(existing._id) !== String(user._id)) {
@@ -95,7 +93,7 @@ router.put('/profile', auth, async (req, res) => {
       user.username = username.trim();
     }
 
-    // Update email
+    
     if (email && email.toLowerCase().trim() !== user.email) {
       const existing = await User.findOne({ email: email.toLowerCase().trim() });
       if (existing && String(existing._id) !== String(user._id)) {
@@ -104,7 +102,7 @@ router.put('/profile', auth, async (req, res) => {
       user.email = email.toLowerCase().trim();
     }
 
-    // Change password (requires current password)
+  
     if (newPassword) {
       if (!currentPassword) {
         return res.status(400).json({ msg: 'Current password is required to set a new password' });
@@ -133,7 +131,7 @@ router.put('/profile', auth, async (req, res) => {
   }
 });
 
-// Delete account
+
 router.delete('/profile', auth, async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -148,7 +146,7 @@ router.delete('/profile', auth, async (req, res) => {
   }
 });
 
-// Forgot password - send OTP
+
 router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
@@ -158,19 +156,18 @@ router.post('/forgot-password', async (req, res) => {
 
     const user = await User.findOne({ email: email.toLowerCase().trim() });
     if (!user) {
-      // For security, return success even if user not found (don't reveal if email exists)
+    
       return res.json({ msg: 'If that email exists, an OTP has been sent' });
     }
 
-    // Generate 6-digit OTP
+  
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     
-    // Store OTP (valid for 10 minutes)
+
     user.resetOtp = otp;
     user.resetOtpExpiry = new Date(Date.now() + 10 * 60 * 1000);
     await user.save();
 
-    // Send email
     const sent = await sendOTPEmail(user.email, user.username, otp);
     if (!sent) {
       return res.status(500).json({ msg: 'Failed to send email. Try again later.' });
@@ -184,7 +181,6 @@ router.post('/forgot-password', async (req, res) => {
   }
 });
 
-// Reset password with OTP
 router.post('/reset-password', async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
@@ -202,12 +198,12 @@ router.post('/reset-password', async (req, res) => {
       return res.status(400).json({ msg: 'Invalid request' });
     }
 
-    // Check if OTP exists and is valid
+
     if (!user.resetOtp || !user.resetOtpExpiry) {
       return res.status(400).json({ msg: 'No reset request found. Request a new OTP.' });
     }
 
-    // Check if OTP expired
+
     if (new Date() > user.resetOtpExpiry) {
       user.resetOtp = undefined;
       user.resetOtpExpiry = undefined;
@@ -215,16 +211,16 @@ router.post('/reset-password', async (req, res) => {
       return res.status(400).json({ msg: 'OTP expired. Request a new one.' });
     }
 
-    // Verify OTP
+
     if (user.resetOtp !== otp.trim()) {
       return res.status(400).json({ msg: 'Invalid OTP' });
     }
 
-    // Update password
+
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
     
-    // Clear OTP fields
+ 
     user.resetOtp = undefined;
     user.resetOtpExpiry = undefined;
     await user.save();
@@ -245,7 +241,6 @@ router.get('/me', auth, async (req, res) => {
     }
     const dbUser = await User.findById(userId).select('-password').lean();
     if (!dbUser) {
-      // Stale token (e.g. user deleted or DB reset) – clear cookie so client stops sending it
       res.clearCookie('token');
       return res.status(404).json({ msg: 'User not found' });
     }

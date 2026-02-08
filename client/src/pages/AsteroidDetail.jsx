@@ -103,7 +103,7 @@ const AsteroidDetail = () => {
       try {
         await refreshUser();
       } catch {
-        /* ignore */
+        
       }
     } catch (err) {
       console.error('Watchlist error:', err);
@@ -172,15 +172,15 @@ const AsteroidDetail = () => {
         Back to Dashboard
       </Link>
 
-      {/* 3D Interactive View – behavior changes based on hazard level */}
+      
       <div className="relative rounded-2xl border border-white/20 overflow-hidden bg-gradient-to-br from-black/40 via-black/30 to-black/40 mb-8 shadow-2xl">
-        {/* Glow effect based on hazard */}
+        
         <div className={`absolute inset-0 opacity-20 blur-3xl ${
           isHighRisk ? 'bg-red-500/30' : isWarning ? 'bg-amber-500/25' : 'bg-green-500/20'
         }`} />
         
         <div className="relative">
-          {/* Header overlay */}
+         
           <div className="absolute top-0 left-0 right-0 z-10 p-4 sm:p-6 bg-gradient-to-b from-black/60 via-black/30 to-transparent">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-3">
@@ -394,7 +394,7 @@ const AsteroidDetail = () => {
           </Card>
         </div>
 
-        {/* Live chat area */}
+        
         <div className="lg:col-span-2">
           <AsteroidChatPanel
             asteroidId={asteroid.nasaId || asteroid._id}

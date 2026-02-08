@@ -24,7 +24,7 @@ const Navbar = () => {
   const navItems = [
     { name: 'Home', path: '/', icon: <Home size={18} /> },
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={18} /> },
-    // Show Watchlist only for authenticated users
+   
     ...(user ? [{ name: 'Watchlist', path: '/watchlist', icon: <Telescope size={18} /> }] : []),
     { name: 'Alerts', path: '/alerts', icon: <Bell size={18} /> },
   ];
@@ -129,7 +129,7 @@ const Navbar = () => {
               </Link>
             ))}
 
-            {/* Mobile profile & logout */}
+           
             {user ? (
               <>
                 <Link

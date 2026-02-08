@@ -8,7 +8,6 @@ import { Input } from './ui/input';
 
 let socket = null;
 
-// Initialize socket connection only once
 function getSocket() {
   if (!socket) {
     socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
@@ -36,14 +35,11 @@ export default function AsteroidChatPanel({ asteroidId, asteroidName }) {
   const typingTimeoutRef = useRef(null);
   const socketConn = getSocket();
 
-  // Auto-scroll to bottom when messages update
   useEffect(() => {
     if (listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight;
     }
   }, [messages]);
-
-  // Main socket setup and asteroid join
   useEffect(() => {
     if (!asteroidId) return;
 
@@ -78,7 +74,7 @@ export default function AsteroidChatPanel({ asteroidId, asteroidName }) {
       setError(errData?.message || 'Connection error');
     };
 
-    // Set up socket listeners
+ 
     socketConn.on('load_messages', handleLoadMessages);
     socketConn.on('receive_message', handleReceiveMessage);
     socketConn.on('user_joined', handleUserJoined);
@@ -86,14 +82,13 @@ export default function AsteroidChatPanel({ asteroidId, asteroidName }) {
     socketConn.on('user_typing', handleUserTyping);
     socketConn.on('error', handleError);
 
-    // Join the asteroid chat room
     socketConn.emit('join_asteroid', {
       asteroidId,
       userId: user?.id,
       userName: user?.username || 'Anonymous',
     });
 
-    // Cleanup on unmount
+   
     return () => {
       socketConn.off('load_messages', handleLoadMessages);
       socketConn.off('receive_message', handleReceiveMessage);
@@ -109,11 +104,11 @@ export default function AsteroidChatPanel({ asteroidId, asteroidName }) {
     };
   }, [asteroidId, user?.id, user?.username, socketConn]);
 
-  // Handle typing indicator
+  
   const handleInputChange = (e) => {
     setInput(e.target.value);
 
-    // Emit typing event
+   
     if (!isTyping) {
       setIsTyping(true);
       socketConn.emit('typing', {
@@ -124,12 +119,12 @@ export default function AsteroidChatPanel({ asteroidId, asteroidName }) {
       });
     }
 
-    // Clear existing timeout
+
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
 
-    // Set timeout to stop typing after 2 seconds of inactivity
+  
     typingTimeoutRef.current = setTimeout(() => {
       setIsTyping(false);
       socketConn.emit('typing', {
@@ -146,7 +141,7 @@ export default function AsteroidChatPanel({ asteroidId, asteroidName }) {
     const text = input.trim();
     if (!text || !user || !asteroidId) return;
 
-    // Emit the message via socket
+   
     socketConn.emit('send_message', {
       asteroidId,
       userId: user.id,
@@ -163,7 +158,7 @@ export default function AsteroidChatPanel({ asteroidId, asteroidName }) {
 
   return (
     <div className="flex flex-col h-full min-h-[400px] lg:min-h-[600px] rounded-2xl border border-white/20 bg-gradient-to-br from-black/40 via-black/30 to-black/40 shadow-2xl backdrop-blur-sm">
-      {/* Header */}
+
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-accent-purple/20 via-accent-purple/10 to-transparent" />
         <div className="relative flex items-center justify-between gap-3 px-5 py-4 border-b border-white/10">
@@ -183,7 +178,7 @@ export default function AsteroidChatPanel({ asteroidId, asteroidName }) {
             </div>
           </div>
 
-          {/* Active Users Count */}
+    
           {activeUsers.length > 0 && (
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
               <Users className="h-4 w-4 text-blue-400" />
@@ -193,7 +188,7 @@ export default function AsteroidChatPanel({ asteroidId, asteroidName }) {
         </div>
       </div>
 
-      {/* Message List */}
+    
       <div
         ref={listRef}
         className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[240px]"
@@ -260,7 +255,7 @@ export default function AsteroidChatPanel({ asteroidId, asteroidName }) {
               );
             })}
 
-            {/* Typing Indicator */}
+        
             {typingUsers.size > 0 && (
               <div className="flex items-center gap-2 text-xs text-gray-500 italic">
                 <div className="flex gap-1">
@@ -285,7 +280,7 @@ export default function AsteroidChatPanel({ asteroidId, asteroidName }) {
         )}
       </div>
 
-      {/* Input Form */}
+    
       <form onSubmit={handleSubmit} className="p-4 border-t border-white/10 bg-black/20">
         {user ? (
           <div className="flex gap-3">

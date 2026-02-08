@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Create Transporter
+
 const transporter = nodemailer.createTransport({
   service: 'gmail', 
   auth: {
@@ -51,7 +51,7 @@ export const sendRiskAlert = async (userEmail, username, asteroid) => {
   }
 };
 
-// Send OTP for password reset
+
 export const sendOTPEmail = async (userEmail, username, otp) => {
   const mailOptions = {
     from: `"Perilux Security" <${process.env.EMAIL_USER}>`,

@@ -79,7 +79,7 @@ const AlertSettings = () => {
             <p className="text-xs text-gray-500">Alert me for asteroids with risk score above this value.</p>
           </div>
 
-          {/* Email Frequency */}
+        
           <div className="space-y-4">
             <Label htmlFor="email-frequency" className="flex items-center gap-2">
               <Mail className="w-4 h-4" />
@@ -119,7 +119,6 @@ const AlertSettings = () => {
             />
           </div>
 
-          {/* Save Button */}
           <div className="flex items-end">
             <Button 
               onClick={handleSave} 
