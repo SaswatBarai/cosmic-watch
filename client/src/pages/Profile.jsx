@@ -2,10 +2,24 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import { motion } from 'framer-motion';
 import {
-  User, Mail, Shield, Star, Bell, Clock, Lock,
+  User, Shield, Star, Bell, Lock,
   Save, Pencil, Trash2, LogOut, ChevronRight, AlertTriangle, Check, X
 } from 'lucide-react';
+
+const container = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.07, delayChildren: 0.1 }
+  }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0 }
+};
 
 const SectionCard = ({ title, icon: Icon, children, className = '' }) => (
   <div className={`rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-5 sm:p-6 ${className}`}>
@@ -169,14 +183,27 @@ const Profile = () => {
     : 'Unknown';
 
   return (
-    <div className="min-h-screen bg-space-950 pt-20 sm:pt-24 pb-16 px-4 sm:px-6">
-      <div className="max-w-3xl mx-auto space-y-6">
-
+    <motion.div
+      className="min-h-screen bg-space-950 pt-20 sm:pt-24 pb-16 px-4 sm:px-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
+      <motion.div
+        className="max-w-3xl mx-auto space-y-6"
+        variants={container}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-          <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-purple-500/20 border-2 border-purple-400/30">
+        <motion.div className="flex flex-col sm:flex-row items-start sm:items-center gap-5" variants={item}>
+          <motion.div
+            className="h-20 w-20 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-purple-500/20 border-2 border-purple-400/30"
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: 'spring', stiffness: 400 }}
+          >
             {user.username?.[0]?.toUpperCase() || '?'}
-          </div>
+          </motion.div>
           <div className="flex-1">
             <h1 className="font-heading text-2xl sm:text-3xl font-bold text-white">{user.username}</h1>
             <p className="text-sm text-gray-400 mt-0.5">{user.email}</p>
@@ -192,63 +219,85 @@ const Profile = () => {
               <span className="text-xs text-gray-500">Member since {memberSince}</span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Notification Banner */}
         {msg.text && (
-          <div className={`flex items-center gap-3 p-3.5 rounded-xl border text-sm font-medium animate-in slide-in-from-top-2 ${
-            msg.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' :
-            msg.type === 'error'   ? 'bg-red-500/10 border-red-500/20 text-red-400' :
-                                     'bg-blue-500/10 border-blue-500/20 text-blue-400'
-          }`}>
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className={`flex items-center gap-3 p-3.5 rounded-xl border text-sm font-medium ${
+              msg.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' :
+              msg.type === 'error'   ? 'bg-red-500/10 border-red-500/20 text-red-400' :
+                                       'bg-blue-500/10 border-blue-500/20 text-blue-400'
+            }`}
+          >
             {msg.type === 'success' ? <Check className="h-4 w-4 shrink-0" /> :
              msg.type === 'error'   ? <AlertTriangle className="h-4 w-4 shrink-0" /> : null}
             <span>{msg.text}</span>
-            <button onClick={() => setMsg({ text: '', type: '' })} className="ml-auto p-1 hover:bg-white/10 rounded-lg">
+            <motion.button
+              onClick={() => setMsg({ text: '', type: '' })}
+              className="ml-auto p-1 hover:bg-white/10 rounded-lg"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
               <X className="h-3.5 w-3.5" />
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         )}
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <StatItem label="Role" value={user.role === 'researcher' ? 'Researcher' : 'Observer'} icon={Shield} variant="blue" />
-          <StatItem label="Watchlist" value={`${watchlistCount} object${watchlistCount !== 1 ? 's' : ''}`} icon={Star} variant="purple" />
-          <StatItem label="Alerts" value={prefs.emailFrequency} icon={Bell} variant="amber" />
-          <StatItem label="Min Risk" value={`${prefs.minRiskScore}+`} icon={AlertTriangle} variant="green" />
-        </div>
+        <motion.div
+          className="grid grid-cols-2 sm:grid-cols-4 gap-3"
+          variants={container}
+        >
+          {[
+            { label: 'Role', value: user.role === 'researcher' ? 'Researcher' : 'Observer', icon: Shield, variant: 'blue' },
+            { label: 'Watchlist', value: `${watchlistCount} object${watchlistCount !== 1 ? 's' : ''}`, icon: Star, variant: 'purple' },
+            { label: 'Alerts', value: prefs.emailFrequency, icon: Bell, variant: 'amber' },
+            { label: 'Min Risk', value: `${prefs.minRiskScore}+`, icon: AlertTriangle, variant: 'green' },
+          ].map((stat) => (
+            <motion.div key={stat.label} variants={item} whileHover={{ scale: 1.03 }} transition={{ type: 'spring', stiffness: 400 }}>
+              <StatItem {...stat} />
+            </motion.div>
+          ))}
+        </motion.div>
 
         {/* Profile Details */}
-        <SectionCard title="Profile Information" icon={User}>
-          {!editing ? (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Username</label>
-                  <p className="text-sm text-white mt-1 font-medium">{user.username}</p>
+        <motion.div variants={item}>
+          <SectionCard title="Profile Information" icon={User}>
+            {!editing ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-gray-500 uppercase tracking-wider">Username</label>
+                    <p className="text-sm text-white mt-1 font-medium">{user.username}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 uppercase tracking-wider">Email</label>
+                    <p className="text-sm text-white mt-1 font-medium">{user.email}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 uppercase tracking-wider">Role</label>
+                    <p className="text-sm text-white mt-1 font-medium capitalize">{user.role}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 uppercase tracking-wider">Member Since</label>
+                    <p className="text-sm text-white mt-1 font-medium">{memberSince}</p>
+                  </div>
                 </div>
-                <div>
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Email</label>
-                  <p className="text-sm text-white mt-1 font-medium">{user.email}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Role</label>
-                  <p className="text-sm text-white mt-1 font-medium capitalize">{user.role}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Member Since</label>
-                  <p className="text-sm text-white mt-1 font-medium">{memberSince}</p>
-                </div>
+                <motion.button
+                  onClick={() => setEditing(true)}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent-purple/15 border border-accent-purple/30 text-accent-purple hover:bg-accent-purple/25 transition-all text-sm font-medium"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Pencil className="h-4 w-4" />
+                  Edit Profile
+                </motion.button>
               </div>
-              <button
-                onClick={() => setEditing(true)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent-purple/15 border border-accent-purple/30 text-accent-purple hover:bg-accent-purple/25 transition-all text-sm font-medium"
-              >
-                <Pencil className="h-4 w-4" />
-                Edit Profile
-              </button>
-            </div>
-          ) : (
+            ) : (
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -302,15 +351,17 @@ const Profile = () => {
               </div>
 
               <div className="flex items-center gap-3 pt-2">
-                <button
+                <motion.button
                   onClick={handleSaveProfile}
                   disabled={saving}
                   className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-purple text-white hover:bg-accent-purple/90 disabled:opacity-50 transition-all text-sm font-medium"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   <Save className="h-4 w-4" />
                   {saving ? 'Saving...' : 'Save Changes'}
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   onClick={() => {
                     setEditing(false);
                     setUsername(user.username || '');
@@ -321,18 +372,22 @@ const Profile = () => {
                     setMsg({ text: '', type: '' });
                   }}
                   className="px-5 py-2.5 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   Cancel
-                </button>
+                </motion.button>
               </div>
             </div>
           )}
-        </SectionCard>
+          </SectionCard>
+        </motion.div>
 
         {/* Alert Preferences */}
-        <SectionCard title="Alert Preferences" icon={Bell}>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <motion.div variants={item}>
+          <SectionCard title="Alert Preferences" icon={Bell}>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="text-xs text-gray-500 uppercase tracking-wider mb-1.5 block">Minimum Risk Score</label>
                 <div className="flex items-center gap-3">
@@ -376,24 +431,33 @@ const Profile = () => {
                 </button>
               </div>
             </div>
-            <button
+            <motion.button
               onClick={handleSavePrefs}
               disabled={prefsLoading}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-purple/15 border border-accent-purple/30 text-accent-purple hover:bg-accent-purple/25 disabled:opacity-50 transition-all text-sm font-medium"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               {prefsSaved ? <Check className="h-4 w-4" /> : <Save className="h-4 w-4" />}
               {prefsLoading ? 'Saving...' : prefsSaved ? 'Saved!' : 'Save Preferences'}
-            </button>
+            </motion.button>
           </div>
-        </SectionCard>
+          </SectionCard>
+        </motion.div>
 
         {/* Watchlist Summary */}
-        <SectionCard title="Watchlist" icon={Star}>
-          {watchlistCount > 0 ? (
-            <div className="space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {(Array.isArray(user.watchlist) ? user.watchlist : []).slice(0, 6).map((item, i) => (
-                  <div key={item.asteroidId || i} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/15 transition-colors">
+        <motion.div variants={item}>
+          <SectionCard title="Watchlist" icon={Star}>
+            {watchlistCount > 0 ? (
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {(Array.isArray(user.watchlist) ? user.watchlist : []).slice(0, 6).map((item, i) => (
+                    <motion.div
+                      key={item.asteroidId || i}
+                      className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/15 transition-colors"
+                      whileHover={{ x: 4 }}
+                      transition={{ type: 'spring', stiffness: 400 }}
+                    >
                     <div className="h-8 w-8 rounded-lg bg-purple-500/15 flex items-center justify-center">
                       <Star className="h-4 w-4 text-purple-400" />
                     </div>
@@ -403,88 +467,107 @@ const Profile = () => {
                         Added {item.addedAt ? new Date(item.addedAt).toLocaleDateString() : '—'}
                       </p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-gray-600 shrink-0" />
-                  </div>
-                ))}
+                      <ChevronRight className="h-4 w-4 text-gray-600 shrink-0" />
+                    </motion.div>
+                  ))}
+                </div>
+                {watchlistCount > 6 && (
+                  <p className="text-xs text-gray-500 text-center">+{watchlistCount - 6} more objects</p>
+                )}
+                <motion.button
+                  onClick={() => navigate('/watchlist')}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10 transition-all text-sm font-medium"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  View Full Watchlist
+                  <ChevronRight className="h-4 w-4" />
+                </motion.button>
               </div>
-              {watchlistCount > 6 && (
-                <p className="text-xs text-gray-500 text-center">+{watchlistCount - 6} more objects</p>
-              )}
-              <button
-                onClick={() => navigate('/watchlist')}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10 transition-all text-sm font-medium"
-              >
-                View Full Watchlist
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <Star className="h-10 w-10 mx-auto mb-3 text-gray-600" />
-              <p className="text-sm text-gray-400">No objects in your watchlist yet</p>
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="mt-3 text-sm text-accent-purple hover:underline"
-              >
-                Browse asteroids on the Dashboard
-              </button>
-            </div>
-          )}
-        </SectionCard>
-
-        {/* Account Actions */}
-        <SectionCard title="Account" icon={Shield}>
-          <div className="space-y-3">
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-3 p-3.5 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10 transition-all text-sm font-medium"
-            >
-              <LogOut className="h-4 w-4" />
-              <span>Sign Out</span>
-              <ChevronRight className="h-4 w-4 ml-auto text-gray-600" />
-            </button>
-
-            {!showDeleteConfirm ? (
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-red-500/20 text-red-400/70 hover:text-red-400 hover:bg-red-500/5 hover:border-red-500/30 transition-all text-sm font-medium"
-              >
-                <Trash2 className="h-4 w-4" />
-                <span>Delete Account</span>
-                <ChevronRight className="h-4 w-4 ml-auto text-gray-600" />
-              </button>
             ) : (
-              <div className="p-4 rounded-xl border border-red-500/30 bg-red-500/5 space-y-3">
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-semibold text-red-400">Are you sure?</p>
-                    <p className="text-xs text-red-300/60 mt-1">This will permanently delete your account, watchlist, and all preferences. This action cannot be undone.</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleDeleteAccount}
-                    disabled={deleting}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 transition-all text-sm font-medium"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    {deleting ? 'Deleting...' : 'Yes, Delete'}
-                  </button>
-                  <button
-                    onClick={() => setShowDeleteConfirm(false)}
-                    className="px-4 py-2 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium"
-                  >
-                    Cancel
-                  </button>
-                </div>
+              <div className="text-center py-8">
+                <Star className="h-10 w-10 mx-auto mb-3 text-gray-600" />
+                <p className="text-sm text-gray-400">No objects in your watchlist yet</p>
+                <motion.button
+                  onClick={() => navigate('/dashboard')}
+                  className="mt-3 text-sm text-accent-purple hover:underline"
+                  whileHover={{ x: 4 }}
+                >
+                  Browse asteroids on the Dashboard
+                </motion.button>
               </div>
             )}
-          </div>
-        </SectionCard>
+          </SectionCard>
+        </motion.div>
 
-      </div>
-    </div>
+        {/* Account Actions */}
+        <motion.div variants={item}>
+          <SectionCard title="Account" icon={Shield}>
+            <div className="space-y-3">
+              <motion.button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 p-3.5 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10 transition-all text-sm font-medium"
+                whileHover={{ x: 4 }}
+                whileTap={{ scale: 0.99 }}
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Sign Out</span>
+                <ChevronRight className="h-4 w-4 ml-auto text-gray-600" />
+              </motion.button>
+
+              {!showDeleteConfirm ? (
+                <motion.button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-red-500/20 text-red-400/70 hover:text-red-400 hover:bg-red-500/5 hover:border-red-500/30 transition-all text-sm font-medium"
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.99 }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  <span>Delete Account</span>
+                  <ChevronRight className="h-4 w-4 ml-auto text-gray-600" />
+                </motion.button>
+              ) : (
+                <motion.div
+                  className="p-4 rounded-xl border border-red-500/30 bg-red-500/5 space-y-3"
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-red-400">Are you sure?</p>
+                      <p className="text-xs text-red-300/60 mt-1">This will permanently delete your account, watchlist, and all preferences. This action cannot be undone.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <motion.button
+                      onClick={handleDeleteAccount}
+                      disabled={deleting}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 transition-all text-sm font-medium"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      {deleting ? 'Deleting...' : 'Yes, Delete'}
+                    </motion.button>
+                    <motion.button
+                      onClick={() => setShowDeleteConfirm(false)}
+                      className="px-4 py-2 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      Cancel
+                    </motion.button>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          </SectionCard>
+        </motion.div>
+
+      </motion.div>
+    </motion.div>
   );
 };
 
